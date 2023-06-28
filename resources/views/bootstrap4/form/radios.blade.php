@@ -6,7 +6,7 @@
     </div>
 @empty
 <div class="form-field">
-{{__('No values')}}
+{{__('No options to select')}}
 </div>
 @endforelse
 </div>
