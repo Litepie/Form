@@ -1,0 +1,88 @@
+<?php
+
+namespace {{ namespace }};
+
+use Litepie\Form\FormBuilder;
+use Illuminate\Container\Container;
+
+class {{ class }}
+{
+    protected FormBuilder $form;
+
+    public function __construct(Container $app)
+    {
+        $this->form = new FormBuilder($app, '{{ formId }}');
+        $this->buildForm();
+    }
+
+    /**
+     * Build the form fields.
+     */
+    protected function buildForm(): void
+    {
+        $this->form
+            ->action(route('{{ formId }}.store'))
+            ->method('POST')
+            ->add('name', 'text', [
+                'label' => 'Name',
+                'required' => true,
+                'placeholder' => 'Enter your name'
+            ])
+            ->add('email', 'email', [
+                'label' => 'Email',
+                'required' => true,
+                'placeholder' => 'Enter your email'
+            ])
+            ->add('message', 'textarea', [
+                'label' => 'Message',
+                'required' => true,
+                'placeholder' => 'Enter your message',
+                'rows' => 5
+            ])
+            ->add('submit', 'submit', [
+                'value' => 'Submit Form',
+                'class' => 'btn btn-primary'
+            ]);
+    }
+
+    /**
+     * Get the form instance.
+     */
+    public function getForm(): FormBuilder
+    {
+        return $this->form;
+    }
+
+    /**
+     * Populate form with data.
+     */
+    public function populate(array $data): self
+    {
+        $this->form->populate($data);
+        return $this;
+    }
+
+    /**
+     * Validate form data.
+     */
+    public function validate(array $data): bool
+    {
+        return $this->form->validate($data);
+    }
+
+    /**
+     * Render the form.
+     */
+    public function render(): string
+    {
+        return $this->form->render();
+    }
+
+    /**
+     * Get form as array.
+     */
+    public function toArray(): array
+    {
+        return $this->form->toArray();
+    }
+}

@@ -134,9 +134,9 @@ class FormServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                Commands\InstallCommand::class,
-                Commands\MakeFormCommand::class,
-                Commands\PublishCommand::class,
+                InstallCommand::class,
+                MakeFormCommand::class,
+                PublishCommand::class,
             ]);
         }
     }

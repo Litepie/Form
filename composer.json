@@ -21,16 +21,16 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Litepie Development Team",
-            "email": "dev@litepie.com",
-            "homepage": "https://litepie.com"
+            "name": "Lavalite Team",
+            "email": "support@lavalite.org",
+            "homepage": "https://lavalite.org"
         }
     ],
     "support": {
         "issues": "https://github.com/litepie/form/issues",
         "source": "https://github.com/litepie/form",
         "docs": "https://github.com/litepie/form/tree/main/doc",
-        "email": "support@litepie.com"
+        "email": "support@lavalite.org"
     },
     "funding": [
         {

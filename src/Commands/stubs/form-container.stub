@@ -1,0 +1,129 @@
+<?php
+
+namespace {{ namespace }};
+
+use Litepie\Form\FormContainer;
+use Litepie\Form\FormBuilder;
+use Illuminate\Container\Container;
+
+class {{ class }} extends FormContainer
+{
+    public function __construct(Container $app, string $id = null)
+    {
+        parent::__construct($app, $id ?? '{{ formId }}_container');
+        $this->setupContainer();
+        $this->buildForms();
+    }
+
+    /**
+     * Setup container configuration.
+     */
+    protected function setupContainer(): void
+    {
+        $this->name('{{ class }} Container')
+             ->description('A container with multiple forms')
+             ->tabbed(true)
+             ->framework('bootstrap5');
+    }
+
+    /**
+     * Build forms for the container.
+     */
+    protected function buildForms(): void
+    {
+        // Create first form
+        $personalForm = $this->createForm('personal', [
+            'title' => 'Personal Information',
+            'description' => 'Enter your personal details'
+        ]);
+
+        $personalForm
+            ->add('first_name', 'text', [
+                'label' => 'First Name',
+                'required' => true
+            ])
+            ->add('last_name', 'text', [
+                'label' => 'Last Name',
+                'required' => true
+            ])
+            ->add('email', 'email', [
+                'label' => 'Email Address',
+                'required' => true
+            ]);
+
+        // Create second form
+        $addressForm = $this->createForm('address', [
+            'title' => 'Address Information',
+            'description' => 'Enter your address details'
+        ]);
+
+        $addressForm
+            ->add('street', 'text', [
+                'label' => 'Street Address',
+                'required' => true
+            ])
+            ->add('city', 'text', [
+                'label' => 'City',
+                'required' => true
+            ])
+            ->add('postal_code', 'text', [
+                'label' => 'Postal Code',
+                'required' => true
+            ]);
+
+        // Create third form
+        $preferencesForm = $this->createForm('preferences', [
+            'title' => 'Preferences',
+            'description' => 'Set your preferences'
+        ]);
+
+        $preferencesForm
+            ->add('newsletter', 'checkbox', [
+                'label' => 'Subscribe to newsletter'
+            ])
+            ->add('notifications', 'select', [
+                'label' => 'Notification Preference',
+                'options' => [
+                    'email' => 'Email',
+                    'sms' => 'SMS',
+                    'none' => 'None'
+                ]
+            ])
+            ->add('submit', 'submit', [
+                'value' => 'Save All',
+                'class' => 'btn btn-success'
+            ]);
+    }
+
+    /**
+     * Populate all forms with data.
+     */
+    public function populateAll(array $data): self
+    {
+        foreach ($this->getForms() as $key => $formData) {
+            if (isset($data[$key])) {
+                $formData['form']->populate($data[$key]);
+            }
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Validate all forms.
+     */
+    public function validateAll(array $data): bool
+    {
+        $this->validationMode('combined');
+        
+        foreach ($this->getForms() as $key => $formData) {
+            if (isset($data[$key])) {
+                if (!$formData['form']->validate($data[$key])) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+}
