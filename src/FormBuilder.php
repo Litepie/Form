@@ -55,6 +55,31 @@ class FormBuilder
     protected array $rules = [];
 
     /**
+     * Form data.
+     */
+    protected array $data = [];
+
+    /**
+     * Whether to include CSRF token.
+     */
+    protected bool $csrf = true;
+
+    /**
+     * Whether form should submit via AJAX.
+     */
+    protected bool $ajax = false;
+
+    /**
+     * Form theme/template.
+     */
+    protected ?string $theme = null;
+
+    /**
+     * Whether form is multi-step.
+     */
+    protected bool $multiStep = false;
+
+    /**
      * Create a new form builder instance.
      */
     public function __construct(Container $app)
@@ -204,7 +229,7 @@ class FormBuilder
             'config' => [
                 'action' => $this->action,
                 'method' => $this->method,
-                'enctype' => $this->files ? 'multipart/form-data' : 'application/x-www-form-urlencoded',
+                'enctype' => $this->hasFiles ? 'multipart/form-data' : 'application/x-www-form-urlencoded',
                 'csrf' => $this->csrf,
                 'ajax' => $this->ajax,
                 'theme' => $this->theme,
