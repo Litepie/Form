@@ -121,10 +121,14 @@ abstract class Field
     }
 
     /**
-     * Set field label.
+     * Get or set field label.
      */
-    public function label(string $label): self
+    public function label(?string $label = null): string|self
     {
+        if ($label === null) {
+            return $this->label ?: Str::title(str_replace('_', ' ', $this->name));
+        }
+        
         $this->label = $label;
         return $this;
     }
@@ -138,10 +142,14 @@ abstract class Field
     }
 
     /**
-     * Set field placeholder.
+     * Get or set field placeholder.
      */
-    public function placeholder(string $placeholder): self
+    public function placeholder(?string $placeholder = null): self|string|null
     {
+        if ($placeholder === null) {
+            return $this->placeholder;
+        }
+        
         $this->placeholder = $placeholder;
         return $this;
     }
@@ -202,19 +210,27 @@ abstract class Field
     }
 
     /**
-     * Set validation rules.
+     * Get or set validation rules.
      */
-    public function validation(string $rules): self
+    public function validation(?string $rules = null): string|self
     {
+        if ($rules === null) {
+            return $this->validation;
+        }
+        
         $this->validation = $rules;
         return $this;
     }
 
     /**
-     * Set help text.
+     * Get or set help text.
      */
-    public function help(string $help): self
+    public function help(?string $help = null): self|string|null
     {
+        if ($help === null) {
+            return $this->help;
+        }
+        
         $this->help = $help;
         return $this;
     }
