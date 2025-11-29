@@ -155,6 +155,14 @@ abstract class Field
     }
 
     /**
+     * Get field placeholder.
+     */
+    public function getPlaceholder(): ?string
+    {
+        return $this->placeholder;
+    }
+
+    /**
      * Add CSS class.
      */
     public function addClass(string $class): self
@@ -188,6 +196,14 @@ abstract class Field
     }
 
     /**
+     * Get field attributes.
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Get or set options.
      */
     public function options(?array $options = null): array|self
@@ -198,6 +214,14 @@ abstract class Field
         
         $this->options = $options;
         return $this;
+    }
+
+    /**
+     * Get field options.
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**
@@ -223,6 +247,22 @@ abstract class Field
     }
 
     /**
+     * Get field validation rules.
+     */
+    public function getRules(): string
+    {
+        return $this->validation;
+    }
+
+    /**
+     * Get field validation messages.
+     */
+    public function getMessages(): array
+    {
+        return [];
+    }
+
+    /**
      * Get or set help text.
      */
     public function help(?string $help = null): self|string|null
@@ -233,6 +273,14 @@ abstract class Field
         
         $this->help = $help;
         return $this;
+    }
+
+    /**
+     * Get field help text.
+     */
+    public function getHelp(): ?string
+    {
+        return $this->help;
     }
 
     /**
@@ -316,6 +364,166 @@ abstract class Field
     public function isRequired(): bool
     {
         return $this->required;
+    }
+
+    /**
+     * Get field disabled status.
+     */
+    public function getDisabled(): bool
+    {
+        return $this->attributes['disabled'] ?? false;
+    }
+
+    /**
+     * Get field readonly status.
+     */
+    public function getReadonly(): bool
+    {
+        return $this->attributes['readonly'] ?? false;
+    }
+
+    /**
+     * Get field class.
+     */
+    public function getClass(): string
+    {
+        return $this->attributes['class'] ?? '';
+    }
+
+    /**
+     * Get field step.
+     */
+    public function getStep(): ?int
+    {
+        return $this->attributes['step'] ?? null;
+    }
+
+    /**
+     * Get field showIf condition.
+     */
+    public function getShowIf(): ?array
+    {
+        return $this->attributes['show_if'] ?? null;
+    }
+
+    /**
+     * Get field hideIf condition.
+     */
+    public function getHideIf(): ?array
+    {
+        return $this->attributes['hide_if'] ?? null;
+    }
+
+    /**
+     * Get accept attribute (for file fields).
+     */
+    public function getAccept(): ?string
+    {
+        return $this->attributes['accept'] ?? null;
+    }
+
+    /**
+     * Get maxSize attribute (for file fields).
+     */
+    public function getMaxSize(): ?int
+    {
+        return $this->attributes['max_size'] ?? null;
+    }
+
+    /**
+     * Get multiple attribute.
+     */
+    public function getMultiple(): bool
+    {
+        return $this->attributes['multiple'] ?? false;
+    }
+
+    /**
+     * Get uploadUrl attribute (for file fields).
+     */
+    public function getUploadUrl(): ?string
+    {
+        return $this->attributes['upload_url'] ?? null;
+    }
+
+    /**
+     * Get searchable attribute (for select fields).
+     */
+    public function getSearchable(): bool
+    {
+        return $this->attributes['searchable'] ?? false;
+    }
+
+    /**
+     * Get min attribute.
+     */
+    public function getMin(): mixed
+    {
+        return $this->attributes['min'] ?? null;
+    }
+
+    /**
+     * Get max attribute.
+     */
+    public function getMax(): mixed
+    {
+        return $this->attributes['max'] ?? null;
+    }
+
+    /**
+     * Get format attribute (for date/time fields).
+     */
+    public function getFormat(): ?string
+    {
+        return $this->attributes['format'] ?? null;
+    }
+
+    /**
+     * Get config attribute (for richtext fields).
+     */
+    public function getConfig(): ?array
+    {
+        return $this->attributes['config'] ?? null;
+    }
+
+    /**
+     * Get height attribute (for richtext fields).
+     */
+    public function getHeight(): ?string
+    {
+        return $this->attributes['height'] ?? null;
+    }
+
+    /**
+     * Get zoom attribute (for map fields).
+     */
+    public function getZoom(): ?int
+    {
+        return $this->attributes['zoom'] ?? null;
+    }
+
+    /**
+     * Get center attribute (for map fields).
+     */
+    public function getCenter(): ?array
+    {
+        return $this->attributes['center'] ?? null;
+    }
+
+    /**
+     * Get markers attribute (for map fields).
+     */
+    public function getMarkers(): ?array
+    {
+        return $this->attributes['markers'] ?? null;
+    }
+
+    /**
+     * Get stepTitle attribute.
+     */
+    public function getStepTitle(): ?string
+    {
+        return $this->attributes['step_title'] ?? null;
     }
 
     /**

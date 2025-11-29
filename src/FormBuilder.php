@@ -268,24 +268,24 @@ class FormBuilder
         
         foreach ($this->fields as $name => $field) {
             $fieldsArray[$name] = [
-                'name' => $field->name(),
-                'type' => $field->type(),
-                'label' => $field->label(),
-                'value' => $field->value(),
-                'placeholder' => $field->placeholder(),
-                'help' => $field->help(),
-                'required' => $field->required(),
-                'disabled' => $field->disabled(),
-                'readonly' => $field->readonly(),
-                'attributes' => $field->attributes(),
-                'validation' => $field->rules(),
-                'options' => $field->options(),
-                'class' => $field->class(),
-                'id' => $field->id(),
-                'step' => $field->step(),
+                'name' => $field->getName(),
+                'type' => $field->getType(),
+                'label' => $field->getLabel(),
+                'value' => $field->getValue(),
+                'placeholder' => $field->getPlaceholder(),
+                'help' => $field->getHelp(),
+                'required' => $field->isRequired(),
+                'disabled' => $field->getDisabled(),
+                'readonly' => $field->getReadonly(),
+                'attributes' => $field->getAttributes(),
+                'validation' => $field->getRules(),
+                'options' => $field->getOptions(),
+                'class' => $field->getClass(),
+                'id' => $field->getId(),
+                'step' => $field->getStep(),
                 'conditional' => [
-                    'show_if' => $field->showIf(),
-                    'hide_if' => $field->hideIf(),
+                    'show_if' => $field->getShowIf(),
+                    'hide_if' => $field->getHideIf(),
                 ],
                 'meta' => $this->getFieldMeta($field)
             ];
@@ -301,18 +301,18 @@ class FormBuilder
     {
         $meta = [
             'hasErrors' => $field->hasErrors(),
-            'errors' => $field->errors(),
+            'errors' => $field->getErrors(),
         ];
 
         // Add type-specific metadata
-        switch ($field->type()) {
+        switch ($field->getType()) {
             case 'file':
             case 'image':
                 $meta['upload'] = [
-                    'accept' => $field->accept(),
-                    'maxSize' => $field->maxSize(),
-                    'multiple' => $field->multiple(),
-                    'uploadUrl' => $field->uploadUrl(),
+                    'accept' => $field->getAccept(),
+                    'maxSize' => $field->getMaxSize(),
+                    'multiple' => $field->getMultiple(),
+                    'uploadUrl' => $field->getUploadUrl(),
                 ];
                 break;
 
@@ -320,18 +320,18 @@ class FormBuilder
             case 'radio':
             case 'checkbox':
                 $meta['selection'] = [
-                    'options' => $field->options(),
-                    'multiple' => $field->multiple(),
-                    'searchable' => $field->searchable(),
+                    'options' => $field->getOptions(),
+                    'multiple' => $field->getMultiple(),
+                    'searchable' => $field->getSearchable(),
                 ];
                 break;
 
             case 'number':
             case 'range':
                 $meta['numeric'] = [
-                    'min' => $field->min(),
-                    'max' => $field->max(),
-                    'step' => $field->step(),
+                    'min' => $field->getMin(),
+                    'max' => $field->getMax(),
+                    'step' => $field->getStep(),
                 ];
                 break;
 
@@ -339,24 +339,24 @@ class FormBuilder
             case 'datetime':
             case 'time':
                 $meta['temporal'] = [
-                    'format' => $field->format(),
-                    'min' => $field->min(),
-                    'max' => $field->max(),
+                    'format' => $field->getFormat(),
+                    'min' => $field->getMin(),
+                    'max' => $field->getMax(),
                 ];
                 break;
 
             case 'richtext':
                 $meta['editor'] = [
-                    'config' => $field->config(),
-                    'height' => $field->height(),
+                    'config' => $field->getConfig(),
+                    'height' => $field->getHeight(),
                 ];
                 break;
 
             case 'map':
                 $meta['map'] = [
-                    'zoom' => $field->zoom(),
-                    'center' => $field->center(),
-                    'markers' => $field->markers(),
+                    'zoom' => $field->getZoom(),
+                    'center' => $field->getCenter(),
+                    'markers' => $field->getMarkers(),
                 ];
                 break;
         }
@@ -370,7 +370,7 @@ class FormBuilder
     protected function getRequiredFields(): array
     {
         return $this->fields->filter(function ($field) {
-            return $field->required();
+            return $field->isRequired();
         })->keys()->toArray();
     }
 
@@ -380,7 +380,7 @@ class FormBuilder
     protected function hasFileUploads(): bool
     {
         return $this->fields->contains(function ($field) {
-            return in_array($field->type(), ['file', 'image', 'gallery']);
+            return in_array($field->getType(), ['file', 'image', 'gallery']);
         });
     }
 
@@ -395,15 +395,15 @@ class FormBuilder
 
         $steps = [];
         foreach ($this->fields as $field) {
-            $step = $field->step() ?? 1;
+            $step = $field->getStep() ?? 1;
             if (!isset($steps[$step])) {
                 $steps[$step] = [
                     'number' => $step,
                     'fields' => [],
-                    'title' => $field->stepTitle() ?? "Step $step",
+                    'title' => $field->getStepTitle() ?? "Step $step",
                 ];
             }
-            $steps[$step]['fields'][] = $field->name();
+            $steps[$step]['fields'][] = $field->getName();
         }
 
         return array_values($steps);
@@ -416,7 +416,7 @@ class FormBuilder
     {
         $rules = [];
         foreach ($this->fields as $name => $field) {
-            if ($fieldRules = $field->rules()) {
+            if ($fieldRules = $field->getRules()) {
                 $rules[$name] = $fieldRules;
             }
         }
@@ -430,7 +430,7 @@ class FormBuilder
     {
         $messages = [];
         foreach ($this->fields as $name => $field) {
-            if ($fieldMessages = $field->messages()) {
+            if ($fieldMessages = $field->getMessages()) {
                 foreach ($fieldMessages as $rule => $message) {
                     $messages["$name.$rule"] = $message;
                 }
