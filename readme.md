@@ -1,5 +1,10 @@
 # Litepie Form Builder
 
+<!-- AI-CONTEXT-START -->
+**Package**: `litepie/form` | **Type**: Laravel Form Builder | **Laravel**: 11+ & 12+ | **PHP**: 8.2+  
+**AI Context**: See [.ai-context.md](.ai-context.md) for structured package information for AI assistants
+<!-- AI-CONTEXT-END -->
+
 A comprehensive, production-ready Laravel form builder package inspired by the original Litepie/Form but completely rewritten for Laravel 12 with modern design patterns and advanced features.
 
 ## 📋 Table of Contents
@@ -23,10 +28,22 @@ A comprehensive, production-ready Laravel form builder package inspired by the o
 
 ## ✨ Features
 
+<!-- FEATURE-MATRIX-START: For AI parsing -->
 - **🚀 Laravel 12 Ready**: Built for Laravel 11+ with full Laravel 12 compatibility
 - **🎨 Multiple UI Frameworks**: Bootstrap 5, Bootstrap 4, Tailwind CSS, and custom themes
 - **📝 30+ Field Types**: Complete field library including advanced types like rich text, maps, file uploads
 - **🔐 Field Visibility Control**: Permission-based, role-based, and conditional field visibility
+  - Methods: `can()`, `roles()`, `visibleWhen()`, `isVisible()`
+  - Integration: Works with `render()`, `toArray()`, `toJson()`
+- **💾 Performance Caching**: User-scoped form caching with TTL support
+  - Methods: `cache()`, `cached()`, `clearCache()`, `withoutCache()`
+  - Automatic per-user cache scoping
+- **🏗️ Hierarchical Organization**: Groups → Sections → Rows → Fields
+  - Methods: `group()`, `section()`, `row()`, `divider()`, `endGroup()`, `endSection()`
+  - Auto-assignment of fields to active group/section
+- **📐 Grid Layout System**: Responsive 12-column grid with custom widths
+  - Methods: `col()`, `width()`, `defaultWidth()`
+  - Output includes width, row, group, section metadata
 - **✅ Advanced Validation**: Real-time validation, conditional rules, custom validators
 - **🔀 Conditional Logic**: Dynamic field visibility, validation, and multi-step forms
 - **📁 File Management**: Drag & drop uploads, image cropping, gallery management, cloud storage
@@ -36,6 +53,7 @@ A comprehensive, production-ready Laravel form builder package inspired by the o
 - **🌐 Client-Side Ready**: Full support for Vue.js, React, Angular with `toArray()` and `toJson()`
 - **🧪 Well Tested**: Comprehensive test suite with 95%+ code coverage
 - **🎯 Developer Friendly**: Fluent API, extensive documentation, helper functions
+<!-- FEATURE-MATRIX-END -->
 
 ## 📦 Installation
 
@@ -1195,32 +1213,70 @@ class ContactFormTest extends TestCase
 
 ## 📚 API Reference
 
+<!-- API-REFERENCE-START: Structured for AI parsing -->
+
 ### FormBuilder Methods
+
+#### Configuration
 ```php
-// Form configuration
-$form->action(string $action)
-$form->method(string $method)
-$form->files(bool $enabled = true)
-$form->theme(string $theme)
-$form->ajax(bool $enabled = true)
-$form->multiStep(bool $enabled = true)
-
-// Field management
-$form->add(string $name, string $type, array $options = [])
-$form->remove(string $name)
-$form->has(string $name)
-$form->get(string $name)
-
-// Data handling
-$form->populate(array $data)
-$form->validate(array $data)
-$form->getValidationRules()
-
-// Rendering
-$form->render()
-$form->renderField(string $name)
-$form->renderErrors()
+$form->action(string $action)              // Set form action URL
+$form->method(string $method)              // Set HTTP method (POST, GET, etc.)
+$form->files(bool $enabled = true)         // Enable file uploads
+$form->theme(string $theme)                // Set UI framework (bootstrap5, tailwind)
+$form->ajax(bool $enabled = true)          // Enable AJAX submission
+$form->multiStep(bool $enabled = true)     // Enable multi-step forms
 ```
+
+#### User & Permissions
+```php
+$form->forUser(object $user)               // Set user for visibility checks
+$form->getUser()                           // Get current user
+```
+
+#### Caching
+```php
+$form->cache(int $ttl = 3600)             // Enable caching with TTL
+$form->cached()                            // Check if caching is enabled
+$form->withoutCache()                      // Disable caching
+$form->clearCache()                        // Clear form cache
+```
+
+#### Field Management
+```php
+$form->add(string $name, string $type, array $options = [])  // Add field
+$form->remove(string $name)                                   // Remove field
+$form->has(string $name)                                      // Check if field exists
+$form->get(string $name)                                      // Get field instance
+```
+
+#### Layout & Organization
+```php
+$form->row(array $fields, ?string $id = null)                                    // Add fields in a row
+$form->group(string $id, ?string $title = null, ?string $description = null)    // Start group
+$form->section(string $id, ?string $title = null, ?string $description = null)  // Start section
+$form->endGroup()                                                                 // End current group
+$form->endSection()                                                               // End current section
+$form->divider(?string $label = null)                                            // Add divider
+$form->defaultWidth(int $width)                                                   // Set default field width
+```
+
+#### Data Handling
+```php
+$form->populate(array $data)               // Populate form with data
+$form->validate(array $data)               // Validate form data
+$form->getValidationRules()                // Get all validation rules
+```
+
+#### Rendering & Output
+```php
+$form->render(?object $user = null)        // Render HTML (respects visibility)
+$form->toArray(?object $user = null)       // Convert to array (respects visibility)
+$form->toJson(?object $user = null)        // Convert to JSON (respects visibility)
+$form->visibleFields(?object $user = null) // Get visible fields only
+$form->renderField(string $name)           // Render single field
+$form->renderErrors()                      // Render validation errors
+```
+<!-- API-REFERENCE-END -->
 
 ### Field Options
 ```php
@@ -1352,6 +1408,27 @@ This package is part of the **Litepie** ecosystem, developed by **Renfos Technol
 - 📚 **Documentation:** [https://docs.lavalite.org](https://docs.lavalite.org)
 - 💼 **Company:** [https://renfos.com](https://renfos.com)
 - 📧 **Support:** [support@lavalite.org](mailto:support@lavalite.org)
+
+---
+
+## 🤖 For AI Assistants
+
+<!-- AI-METADATA-START -->
+**Quick Context File**: [.ai-context.md](.ai-context.md) - Comprehensive package structure and patterns  
+**Architecture Pattern**: Fluent Builder + Factory + Service Provider  
+**Key Classes**: `FormBuilder`, `Field`, `FormRenderer`, `FormValidator`  
+**Main Features**: Visibility Control, Caching, Hierarchical Organization, Grid Layout  
+**Output Formats**: HTML (`render()`), Array (`toArray()`), JSON (`toJson()`)  
+**Integration**: Laravel 11+/12+, Bootstrap/Tailwind, Vue/React/Angular  
+
+**Common User Requests**:
+- "Create form" → `Form::create()->add()->render()`
+- "Hide field from users" → `->can('permission')` or `->roles(['admin'])`
+- "Improve performance" → `->cache(ttl)`
+- "Responsive layout" → `->row([Field::text()->col(6), ...])`
+- "Complex sections" → `->group()->section()->row()`
+- "JSON for frontend" → `->toArray()` or `->toJson()`
+<!-- AI-METADATA-END -->
 
 ---
 

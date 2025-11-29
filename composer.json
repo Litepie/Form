@@ -17,8 +17,15 @@
         "accessibility"
     ],
     "homepage": "https://github.com/litepie/form",
-    "readme": "readme.md",
+    "readme": "README.md",
     "license": "MIT",
+    "documentation": {
+        "readme": "README.md",
+        "ai-context": ".ai-context.md",
+        "visibility": "VISIBILITY.md",
+        "examples": "EXAMPLES.md",
+        "client-side": "CLIENT_SIDE_EXAMPLES.md"
+    },
     "authors": [
         {
             "name": "Lavalite Team",

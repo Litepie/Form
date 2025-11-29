@@ -1,0 +1,1548 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Litepie Form Builder - Field Examples",
+  "description": "Comprehensive examples of all field types with common configurations",
+  "version": "1.0.0",
+  "fields": {
+    "text": {
+      "type": "text",
+      "description": "Standard text input field",
+      "examples": [
+        {
+          "name": "username",
+          "type": "text",
+          "label": "Username",
+          "placeholder": "Enter your username",
+          "required": true,
+          "validation": "required|string|min:3|max:50",
+          "width": 6,
+          "totalColumns": 12,
+          "help": "Choose a unique username",
+          "class": "form-control",
+          "attributes": {
+            "autocomplete": "username",
+            "maxlength": "50"
+          }
+        },
+        {
+          "name": "company_name",
+          "type": "text",
+          "label": "Company Name",
+          "placeholder": "Acme Corporation",
+          "required": false,
+          "width": 12,
+          "row": "row1",
+          "group": "business_info",
+          "section": "company_details"
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "label": "API Key",
+          "readonly": true,
+          "disabled": false,
+          "width": 8,
+          "permission": "view-api-keys",
+          "roles": ["admin", "developer"]
+        }
+      ],
+      "options": {
+        "label": "Field label text",
+        "placeholder": "Placeholder text",
+        "value": "Default or current value",
+        "required": "boolean - field is required",
+        "validation": "Laravel validation rules (string or array)",
+        "help": "Help text displayed below field",
+        "class": "CSS classes for the input",
+        "attributes": "HTML attributes as key-value pairs",
+        "width": "Column width (1-12)",
+        "totalColumns": "Total columns (default: 12)",
+        "row": "Row identifier for grouping",
+        "group": "Group identifier for hierarchical organization",
+        "section": "Section identifier within a group",
+        "readonly": "boolean - field is read-only",
+        "disabled": "boolean - field is disabled",
+        "permission": "Required permission to view field",
+        "roles": "Array of roles that can view field",
+        "visibilityCondition": "Custom visibility logic (not serializable)"
+      }
+    },
+    "email": {
+      "type": "email",
+      "description": "Email input with built-in validation",
+      "examples": [
+        {
+          "name": "email",
+          "type": "email",
+          "label": "Email Address",
+          "placeholder": "you@example.com",
+          "required": true,
+          "validation": "required|email|unique:users,email",
+          "width": 6,
+          "help": "We'll never share your email"
+        },
+        {
+          "name": "work_email",
+          "type": "email",
+          "label": "Work Email",
+          "placeholder": "name@company.com",
+          "validation": "email|nullable",
+          "width": 6,
+          "group": "contact_info",
+          "section": "professional"
+        }
+      ],
+      "options": {
+        "All text field options": "plus email-specific features",
+        "autocomplete": "email"
+      }
+    },
+    "password": {
+      "type": "password",
+      "description": "Password input field with masking",
+      "examples": [
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "validation": "required|string|min:8|confirmed",
+          "width": 6,
+          "help": "Minimum 8 characters"
+        },
+        {
+          "name": "password_confirmation",
+          "type": "password",
+          "label": "Confirm Password",
+          "required": true,
+          "width": 6
+        },
+        {
+          "name": "current_password",
+          "type": "password",
+          "label": "Current Password",
+          "validation": "required|current_password",
+          "width": 12,
+          "group": "security",
+          "section": "change_password"
+        }
+      ]
+    },
+    "number": {
+      "type": "number",
+      "description": "Numeric input with min/max constraints",
+      "examples": [
+        {
+          "name": "age",
+          "type": "number",
+          "label": "Age",
+          "placeholder": "25",
+          "required": true,
+          "validation": "required|integer|min:18|max:120",
+          "width": 4,
+          "attributes": {
+            "min": "18",
+            "max": "120",
+            "step": "1"
+          }
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "label": "Price",
+          "placeholder": "99.99",
+          "validation": "required|numeric|min:0",
+          "width": 4,
+          "attributes": {
+            "min": "0",
+            "step": "0.01"
+          }
+        },
+        {
+          "name": "salary",
+          "type": "number",
+          "label": "Annual Salary",
+          "validation": "nullable|numeric",
+          "width": 6,
+          "permission": "view-salary",
+          "roles": ["admin", "hr"]
+        }
+      ],
+      "options": {
+        "min": "Minimum value",
+        "max": "Maximum value",
+        "step": "Increment step"
+      }
+    },
+    "tel": {
+      "type": "tel",
+      "description": "Telephone number input",
+      "examples": [
+        {
+          "name": "phone",
+          "type": "tel",
+          "label": "Phone Number",
+          "placeholder": "+1 (555) 123-4567",
+          "validation": "required|regex:/^[+]?[0-9\\s\\-\\(\\)]+$/",
+          "width": 6
+        },
+        {
+          "name": "mobile",
+          "type": "tel",
+          "label": "Mobile",
+          "validation": "nullable",
+          "width": 6,
+          "group": "contact_info"
+        }
+      ]
+    },
+    "url": {
+      "type": "url",
+      "description": "URL input with validation",
+      "examples": [
+        {
+          "name": "website",
+          "type": "url",
+          "label": "Website",
+          "placeholder": "https://example.com",
+          "validation": "nullable|url",
+          "width": 6
+        },
+        {
+          "name": "linkedin",
+          "type": "url",
+          "label": "LinkedIn Profile",
+          "placeholder": "https://linkedin.com/in/username",
+          "validation": "nullable|url",
+          "width": 6,
+          "group": "social_media"
+        }
+      ]
+    },
+    "search": {
+      "type": "search",
+      "description": "Search input field",
+      "examples": [
+        {
+          "name": "search_query",
+          "type": "search",
+          "label": "Search",
+          "placeholder": "Search...",
+          "width": 12,
+          "attributes": {
+            "autocomplete": "off"
+          }
+        }
+      ]
+    },
+    "hidden": {
+      "type": "hidden",
+      "description": "Hidden input field",
+      "examples": [
+        {
+          "name": "_token",
+          "type": "hidden",
+          "value": "csrf_token_value"
+        },
+        {
+          "name": "user_id",
+          "type": "hidden",
+          "value": "123"
+        }
+      ]
+    },
+    "date": {
+      "type": "date",
+      "description": "Date picker field",
+      "examples": [
+        {
+          "name": "birth_date",
+          "type": "date",
+          "label": "Date of Birth",
+          "required": true,
+          "validation": "required|date|before:today",
+          "width": 6,
+          "attributes": {
+            "max": "2024-12-31"
+          }
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "label": "Start Date",
+          "validation": "required|date|after_or_equal:today",
+          "width": 6,
+          "group": "event_details"
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "label": "End Date",
+          "validation": "required|date|after:start_date",
+          "width": 6,
+          "group": "event_details"
+        }
+      ],
+      "options": {
+        "min": "Minimum selectable date",
+        "max": "Maximum selectable date",
+        "format": "Date display format"
+      }
+    },
+    "time": {
+      "type": "time",
+      "description": "Time picker field",
+      "examples": [
+        {
+          "name": "appointment_time",
+          "type": "time",
+          "label": "Appointment Time",
+          "required": true,
+          "validation": "required",
+          "width": 4,
+          "attributes": {
+            "step": "900"
+          }
+        },
+        {
+          "name": "opening_time",
+          "type": "time",
+          "label": "Opening Time",
+          "value": "09:00",
+          "width": 6,
+          "group": "business_hours"
+        }
+      ],
+      "options": {
+        "step": "Time step in seconds (e.g., 900 = 15 minutes)"
+      }
+    },
+    "datetime": {
+      "type": "datetime",
+      "description": "Combined date and time picker",
+      "examples": [
+        {
+          "name": "event_datetime",
+          "type": "datetime",
+          "label": "Event Date & Time",
+          "required": true,
+          "validation": "required|date|after:now",
+          "width": 8
+        }
+      ]
+    },
+    "week": {
+      "type": "week",
+      "description": "Week picker",
+      "examples": [
+        {
+          "name": "work_week",
+          "type": "week",
+          "label": "Work Week",
+          "width": 6
+        }
+      ]
+    },
+    "month": {
+      "type": "month",
+      "description": "Month picker",
+      "examples": [
+        {
+          "name": "billing_month",
+          "type": "month",
+          "label": "Billing Month",
+          "required": true,
+          "width": 6
+        }
+      ]
+    },
+    "select": {
+      "type": "select",
+      "description": "Dropdown select field",
+      "examples": [
+        {
+          "name": "country",
+          "type": "select",
+          "label": "Country",
+          "required": true,
+          "validation": "required|in:us,uk,ca,au",
+          "width": 6,
+          "options": {
+            "us": "United States",
+            "uk": "United Kingdom",
+            "ca": "Canada",
+            "au": "Australia"
+          }
+        },
+        {
+          "name": "department",
+          "type": "select",
+          "label": "Department",
+          "required": true,
+          "width": 6,
+          "group": "employee_info",
+          "options": {
+            "": "-- Select Department --",
+            "sales": "Sales",
+            "engineering": "Engineering",
+            "hr": "Human Resources",
+            "marketing": "Marketing"
+          }
+        },
+        {
+          "name": "tags",
+          "type": "select",
+          "label": "Tags",
+          "width": 12,
+          "multiple": true,
+          "options": {
+            "laravel": "Laravel",
+            "php": "PHP",
+            "javascript": "JavaScript",
+            "vue": "Vue.js"
+          }
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "label": "Category",
+          "width": 6,
+          "optgroups": {
+            "Frontend": {
+              "html": "HTML",
+              "css": "CSS",
+              "js": "JavaScript"
+            },
+            "Backend": {
+              "php": "PHP",
+              "python": "Python",
+              "ruby": "Ruby"
+            }
+          }
+        }
+      ],
+      "options": {
+        "options": "Key-value pairs for dropdown options",
+        "optgroups": "Grouped options",
+        "multiple": "Allow multiple selections",
+        "searchable": "Enable search functionality"
+      }
+    },
+    "radio": {
+      "type": "radio",
+      "description": "Radio button group",
+      "examples": [
+        {
+          "name": "account_type",
+          "type": "radio",
+          "label": "Account Type",
+          "required": true,
+          "validation": "required|in:personal,business",
+          "width": 6,
+          "options": {
+            "personal": "Personal",
+            "business": "Business"
+          }
+        },
+        {
+          "name": "gender",
+          "type": "radio",
+          "label": "Gender",
+          "width": 6,
+          "inline": true,
+          "options": {
+            "male": "Male",
+            "female": "Female",
+            "other": "Other",
+            "prefer_not_to_say": "Prefer not to say"
+          }
+        },
+        {
+          "name": "subscription_plan",
+          "type": "radio",
+          "label": "Subscription Plan",
+          "required": true,
+          "width": 12,
+          "group": "billing",
+          "options": {
+            "free": "Free - $0/month",
+            "basic": "Basic - $9/month",
+            "pro": "Pro - $29/month",
+            "enterprise": "Enterprise - Contact Us"
+          }
+        }
+      ],
+      "options": {
+        "options": "Key-value pairs for radio options",
+        "inline": "Display options inline instead of stacked"
+      }
+    },
+    "checkbox": {
+      "type": "checkbox",
+      "description": "Checkbox field or checkbox group",
+      "examples": [
+        {
+          "name": "terms_accepted",
+          "type": "checkbox",
+          "label": "I accept the Terms and Conditions",
+          "required": true,
+          "validation": "required|accepted",
+          "width": 12
+        },
+        {
+          "name": "newsletter",
+          "type": "checkbox",
+          "label": "Subscribe to newsletter",
+          "value": "1",
+          "width": 6
+        },
+        {
+          "name": "interests",
+          "type": "checkbox",
+          "label": "Interests",
+          "width": 12,
+          "multiple": true,
+          "options": {
+            "sports": "Sports",
+            "music": "Music",
+            "technology": "Technology",
+            "travel": "Travel",
+            "cooking": "Cooking"
+          }
+        },
+        {
+          "name": "notifications",
+          "type": "checkbox",
+          "label": "Notification Preferences",
+          "width": 12,
+          "group": "settings",
+          "inline": true,
+          "options": {
+            "email": "Email",
+            "sms": "SMS",
+            "push": "Push Notifications"
+          }
+        }
+      ],
+      "options": {
+        "options": "For checkbox groups - key-value pairs",
+        "multiple": "Allow multiple selections (checkbox group)",
+        "inline": "Display checkboxes inline"
+      }
+    },
+    "tags": {
+      "type": "tags",
+      "description": "Tag input with autocomplete",
+      "examples": [
+        {
+          "name": "skills",
+          "type": "tags",
+          "label": "Skills",
+          "placeholder": "Add skills...",
+          "width": 12,
+          "suggestions": ["PHP", "Laravel", "JavaScript", "Vue.js", "React", "Python"]
+        },
+        {
+          "name": "keywords",
+          "type": "tags",
+          "label": "Keywords",
+          "width": 12,
+          "allowCustom": true,
+          "maxTags": 10
+        }
+      ],
+      "options": {
+        "suggestions": "Array of suggested tags",
+        "allowCustom": "Allow user-created tags",
+        "maxTags": "Maximum number of tags"
+      }
+    },
+    "textarea": {
+      "type": "textarea",
+      "description": "Multi-line text input",
+      "examples": [
+        {
+          "name": "description",
+          "type": "textarea",
+          "label": "Description",
+          "placeholder": "Enter a detailed description...",
+          "required": true,
+          "validation": "required|string|min:10|max:1000",
+          "width": 12,
+          "rows": 5,
+          "help": "Minimum 10 characters"
+        },
+        {
+          "name": "bio",
+          "type": "textarea",
+          "label": "Biography",
+          "width": 12,
+          "rows": 8,
+          "maxlength": 500,
+          "group": "profile"
+        },
+        {
+          "name": "notes",
+          "type": "textarea",
+          "label": "Notes",
+          "width": 12,
+          "rows": 3,
+          "autoResize": true
+        }
+      ],
+      "options": {
+        "rows": "Number of visible rows",
+        "maxlength": "Maximum character count",
+        "autoResize": "Automatically resize based on content"
+      }
+    },
+    "richtext": {
+      "type": "richtext",
+      "description": "WYSIWYG rich text editor",
+      "examples": [
+        {
+          "name": "content",
+          "type": "richtext",
+          "label": "Content",
+          "required": true,
+          "validation": "required|string",
+          "width": 12,
+          "height": 400,
+          "toolbar": "bold italic underline | link image | bullist numlist"
+        },
+        {
+          "name": "article_body",
+          "type": "richtext",
+          "label": "Article Body",
+          "width": 12,
+          "height": 600,
+          "group": "content",
+          "toolbar": "undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code"
+        }
+      ],
+      "options": {
+        "height": "Editor height in pixels",
+        "toolbar": "TinyMCE toolbar configuration",
+        "menubar": "Show/hide menubar",
+        "plugins": "TinyMCE plugins to enable"
+      }
+    },
+    "file": {
+      "type": "file",
+      "description": "File upload field",
+      "examples": [
+        {
+          "name": "resume",
+          "type": "file",
+          "label": "Upload Resume",
+          "required": true,
+          "validation": "required|file|mimes:pdf,doc,docx|max:5120",
+          "width": 12,
+          "accept": ".pdf,.doc,.docx",
+          "maxSize": "5MB",
+          "help": "Accepted formats: PDF, DOC, DOCX (Max 5MB)"
+        },
+        {
+          "name": "attachment",
+          "type": "file",
+          "label": "Attachment",
+          "width": 6,
+          "accept": "*",
+          "maxSize": "10MB",
+          "group": "documents"
+        }
+      ],
+      "options": {
+        "accept": "Accepted file types",
+        "maxSize": "Maximum file size",
+        "multiple": "Allow multiple file uploads",
+        "dragDrop": "Enable drag and drop"
+      }
+    },
+    "image": {
+      "type": "image",
+      "description": "Image upload with preview and crop",
+      "examples": [
+        {
+          "name": "avatar",
+          "type": "image",
+          "label": "Profile Picture",
+          "validation": "nullable|image|max:2048",
+          "width": 6,
+          "accept": "image/*",
+          "maxSize": "2MB",
+          "crop": true,
+          "aspectRatio": "1:1",
+          "minWidth": 400,
+          "minHeight": 400
+        },
+        {
+          "name": "cover_image",
+          "type": "image",
+          "label": "Cover Image",
+          "width": 12,
+          "crop": true,
+          "aspectRatio": "16:9",
+          "maxSize": "5MB",
+          "group": "media"
+        }
+      ],
+      "options": {
+        "crop": "Enable image cropping",
+        "aspectRatio": "Crop aspect ratio (e.g., 16:9, 1:1)",
+        "minWidth": "Minimum image width",
+        "minHeight": "Minimum image height",
+        "preview": "Show image preview"
+      }
+    },
+    "gallery": {
+      "type": "gallery",
+      "description": "Multiple image upload gallery",
+      "examples": [
+        {
+          "name": "product_images",
+          "type": "gallery",
+          "label": "Product Images",
+          "width": 12,
+          "maxFiles": 10,
+          "maxSize": "3MB",
+          "sortable": true,
+          "preview": true
+        },
+        {
+          "name": "portfolio",
+          "type": "gallery",
+          "label": "Portfolio Images",
+          "width": 12,
+          "maxFiles": 20,
+          "group": "media"
+        }
+      ],
+      "options": {
+        "maxFiles": "Maximum number of images",
+        "sortable": "Allow drag-and-drop reordering",
+        "preview": "Show image previews",
+        "thumbnailSize": "Thumbnail dimensions"
+      }
+    },
+    "color": {
+      "type": "color",
+      "description": "Color picker field",
+      "examples": [
+        {
+          "name": "brand_color",
+          "type": "color",
+          "label": "Brand Color",
+          "value": "#3490dc",
+          "width": 4
+        },
+        {
+          "name": "background_color",
+          "type": "color",
+          "label": "Background Color",
+          "width": 4,
+          "group": "theme_settings"
+        },
+        {
+          "name": "text_color",
+          "type": "color",
+          "label": "Text Color",
+          "value": "#000000",
+          "width": 4,
+          "group": "theme_settings"
+        }
+      ],
+      "options": {
+        "format": "Color format (hex, rgb, hsl)",
+        "alpha": "Enable alpha/opacity channel"
+      }
+    },
+    "range": {
+      "type": "range",
+      "description": "Range slider field",
+      "examples": [
+        {
+          "name": "volume",
+          "type": "range",
+          "label": "Volume",
+          "value": "50",
+          "width": 6,
+          "min": 0,
+          "max": 100,
+          "step": 5
+        },
+        {
+          "name": "price_range",
+          "type": "range",
+          "label": "Price Range",
+          "width": 12,
+          "min": 0,
+          "max": 1000,
+          "step": 10,
+          "showValue": true
+        },
+        {
+          "name": "rating_threshold",
+          "type": "range",
+          "label": "Minimum Rating",
+          "width": 6,
+          "min": 1,
+          "max": 5,
+          "step": 0.5,
+          "group": "filters"
+        }
+      ],
+      "options": {
+        "min": "Minimum value",
+        "max": "Maximum value",
+        "step": "Step increment",
+        "showValue": "Display current value"
+      }
+    },
+    "rating": {
+      "type": "rating",
+      "description": "Star rating field",
+      "examples": [
+        {
+          "name": "product_rating",
+          "type": "rating",
+          "label": "Rate this product",
+          "required": true,
+          "width": 6,
+          "max": 5,
+          "allowHalf": false
+        },
+        {
+          "name": "service_rating",
+          "type": "rating",
+          "label": "Service Rating",
+          "width": 6,
+          "max": 5,
+          "allowHalf": true,
+          "readonly": false
+        }
+      ],
+      "options": {
+        "max": "Maximum rating (number of stars)",
+        "allowHalf": "Allow half-star ratings",
+        "readonly": "Display only (not editable)",
+        "icon": "Custom icon for rating"
+      }
+    },
+    "map": {
+      "type": "map",
+      "description": "Location picker with map",
+      "examples": [
+        {
+          "name": "business_location",
+          "type": "map",
+          "label": "Business Location",
+          "width": 12,
+          "latitude": 40.7128,
+          "longitude": -74.0060,
+          "zoom": 12,
+          "searchable": true
+        },
+        {
+          "name": "delivery_address",
+          "type": "map",
+          "label": "Delivery Address",
+          "width": 12,
+          "group": "location_details"
+        }
+      ],
+      "options": {
+        "latitude": "Initial latitude",
+        "longitude": "Initial longitude",
+        "zoom": "Initial zoom level",
+        "searchable": "Enable location search",
+        "provider": "Map provider (google, openstreetmap)"
+      }
+    },
+    "divider": {
+      "type": "divider",
+      "description": "Visual separator with optional label",
+      "examples": [
+        {
+          "name": "divider_1",
+          "type": "divider",
+          "label": "Personal Information"
+        },
+        {
+          "name": "divider_2",
+          "type": "divider",
+          "label": "Account Settings",
+          "group": "settings"
+        },
+        {
+          "name": "divider_3",
+          "type": "divider"
+        }
+      ],
+      "options": {
+        "label": "Optional text label for divider",
+        "style": "Divider style (solid, dashed, dotted)"
+      }
+    },
+    "html": {
+      "type": "html",
+      "description": "Custom HTML content",
+      "examples": [
+        {
+          "name": "custom_notice",
+          "type": "html",
+          "content": "<div class='alert alert-info'>Please complete all required fields.</div>",
+          "width": 12
+        },
+        {
+          "name": "help_text",
+          "type": "html",
+          "content": "<p><strong>Note:</strong> Your data is encrypted and secure.</p>",
+          "width": 12,
+          "group": "information"
+        }
+      ],
+      "options": {
+        "content": "Raw HTML content to display"
+      }
+    },
+    "button": {
+      "type": "button",
+      "description": "Generic button",
+      "examples": [
+        {
+          "name": "cancel_btn",
+          "type": "button",
+          "value": "Cancel",
+          "class": "btn btn-secondary",
+          "width": 3
+        },
+        {
+          "name": "custom_action",
+          "type": "button",
+          "value": "Custom Action",
+          "class": "btn btn-info",
+          "width": 3,
+          "attributes": {
+            "onclick": "handleCustomAction()"
+          }
+        }
+      ]
+    },
+    "submit": {
+      "type": "submit",
+      "description": "Form submit button",
+      "examples": [
+        {
+          "name": "submit",
+          "type": "submit",
+          "value": "Submit",
+          "class": "btn btn-primary",
+          "width": 3
+        },
+        {
+          "name": "save",
+          "type": "submit",
+          "value": "Save Changes",
+          "class": "btn btn-success",
+          "width": 3
+        }
+      ]
+    },
+    "reset": {
+      "type": "reset",
+      "description": "Form reset button",
+      "examples": [
+        {
+          "name": "reset",
+          "type": "reset",
+          "value": "Reset Form",
+          "class": "btn btn-warning",
+          "width": 3
+        }
+      ]
+    }
+  },
+  "commonCombinations": {
+    "userRegistration": {
+      "description": "Complete user registration form",
+      "fields": [
+        {
+          "name": "first_name",
+          "type": "text",
+          "label": "First Name",
+          "required": true,
+          "validation": "required|string|max:255",
+          "width": 6,
+          "row": "row1",
+          "group": "personal_info",
+          "section": "basic"
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "label": "Last Name",
+          "required": true,
+          "validation": "required|string|max:255",
+          "width": 6,
+          "row": "row1",
+          "group": "personal_info",
+          "section": "basic"
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "label": "Email",
+          "required": true,
+          "validation": "required|email|unique:users",
+          "width": 6,
+          "row": "row2",
+          "group": "personal_info",
+          "section": "basic"
+        },
+        {
+          "name": "phone",
+          "type": "tel",
+          "label": "Phone",
+          "validation": "nullable|regex:/^[+]?[0-9\\s\\-\\(\\)]+$/",
+          "width": 6,
+          "row": "row2",
+          "group": "personal_info",
+          "section": "basic"
+        },
+        {
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "required": true,
+          "validation": "required|min:8|confirmed",
+          "width": 6,
+          "row": "row3",
+          "group": "account_security",
+          "section": "credentials"
+        },
+        {
+          "name": "password_confirmation",
+          "type": "password",
+          "label": "Confirm Password",
+          "required": true,
+          "width": 6,
+          "row": "row3",
+          "group": "account_security",
+          "section": "credentials"
+        },
+        {
+          "name": "terms",
+          "type": "checkbox",
+          "label": "I agree to the Terms and Conditions",
+          "required": true,
+          "validation": "required|accepted",
+          "width": 12,
+          "row": "row4"
+        },
+        {
+          "name": "submit",
+          "type": "submit",
+          "value": "Register",
+          "class": "btn btn-primary",
+          "width": 3,
+          "row": "row5"
+        }
+      ]
+    },
+    "contactForm": {
+      "description": "Simple contact form",
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "label": "Your Name",
+          "required": true,
+          "validation": "required|string|max:255",
+          "width": 6,
+          "row": "row1"
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "label": "Email Address",
+          "required": true,
+          "validation": "required|email",
+          "width": 6,
+          "row": "row1"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "label": "Subject",
+          "required": true,
+          "validation": "required|string|max:255",
+          "width": 12,
+          "row": "row2"
+        },
+        {
+          "name": "message",
+          "type": "textarea",
+          "label": "Message",
+          "required": true,
+          "validation": "required|string|min:10",
+          "width": 12,
+          "rows": 5,
+          "row": "row3"
+        },
+        {
+          "name": "submit",
+          "type": "submit",
+          "value": "Send Message",
+          "class": "btn btn-primary",
+          "width": 3,
+          "row": "row4"
+        }
+      ]
+    },
+    "productForm": {
+      "description": "E-commerce product form",
+      "fields": [
+        {
+          "name": "product_name",
+          "type": "text",
+          "label": "Product Name",
+          "required": true,
+          "validation": "required|string|max:255",
+          "width": 8,
+          "row": "row1",
+          "group": "basic_info"
+        },
+        {
+          "name": "sku",
+          "type": "text",
+          "label": "SKU",
+          "required": true,
+          "validation": "required|string|unique:products",
+          "width": 4,
+          "row": "row1",
+          "group": "basic_info"
+        },
+        {
+          "name": "description",
+          "type": "richtext",
+          "label": "Description",
+          "required": true,
+          "width": 12,
+          "row": "row2",
+          "group": "basic_info"
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "label": "Price",
+          "required": true,
+          "validation": "required|numeric|min:0",
+          "width": 4,
+          "row": "row3",
+          "group": "pricing",
+          "attributes": {
+            "step": "0.01"
+          }
+        },
+        {
+          "name": "compare_price",
+          "type": "number",
+          "label": "Compare at Price",
+          "validation": "nullable|numeric|min:0",
+          "width": 4,
+          "row": "row3",
+          "group": "pricing"
+        },
+        {
+          "name": "stock",
+          "type": "number",
+          "label": "Stock Quantity",
+          "required": true,
+          "validation": "required|integer|min:0",
+          "width": 4,
+          "row": "row3",
+          "group": "inventory"
+        },
+        {
+          "name": "category",
+          "type": "select",
+          "label": "Category",
+          "required": true,
+          "width": 6,
+          "row": "row4",
+          "group": "categorization",
+          "options": {
+            "": "-- Select Category --",
+            "electronics": "Electronics",
+            "clothing": "Clothing",
+            "books": "Books",
+            "home": "Home & Garden"
+          }
+        },
+        {
+          "name": "tags",
+          "type": "tags",
+          "label": "Tags",
+          "width": 6,
+          "row": "row4",
+          "group": "categorization"
+        },
+        {
+          "name": "images",
+          "type": "gallery",
+          "label": "Product Images",
+          "width": 12,
+          "row": "row5",
+          "group": "media",
+          "maxFiles": 8
+        },
+        {
+          "name": "is_featured",
+          "type": "checkbox",
+          "label": "Featured Product",
+          "width": 4,
+          "row": "row6",
+          "group": "options"
+        },
+        {
+          "name": "is_active",
+          "type": "checkbox",
+          "label": "Active",
+          "value": "1",
+          "width": 4,
+          "row": "row6",
+          "group": "options"
+        },
+        {
+          "name": "submit",
+          "type": "submit",
+          "value": "Save Product",
+          "class": "btn btn-primary",
+          "width": 3,
+          "row": "row7"
+        }
+      ]
+    },
+    "userProfileWithPermissions": {
+      "description": "User profile with permission-based field visibility",
+      "fields": [
+        {
+          "name": "avatar",
+          "type": "image",
+          "label": "Profile Picture",
+          "width": 12,
+          "row": "row1",
+          "group": "profile",
+          "crop": true,
+          "aspectRatio": "1:1"
+        },
+        {
+          "name": "first_name",
+          "type": "text",
+          "label": "First Name",
+          "required": true,
+          "width": 6,
+          "row": "row2",
+          "group": "profile"
+        },
+        {
+          "name": "last_name",
+          "type": "text",
+          "label": "Last Name",
+          "required": true,
+          "width": 6,
+          "row": "row2",
+          "group": "profile"
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "label": "Email",
+          "required": true,
+          "width": 12,
+          "row": "row3",
+          "group": "profile"
+        },
+        {
+          "name": "salary",
+          "type": "number",
+          "label": "Annual Salary",
+          "width": 6,
+          "row": "row4",
+          "group": "employment",
+          "section": "compensation",
+          "permission": "view-salary",
+          "roles": ["admin", "hr"]
+        },
+        {
+          "name": "department",
+          "type": "select",
+          "label": "Department",
+          "width": 6,
+          "row": "row4",
+          "group": "employment",
+          "section": "details",
+          "roles": ["manager", "admin"],
+          "options": {
+            "sales": "Sales",
+            "engineering": "Engineering",
+            "hr": "HR"
+          }
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "label": "API Key",
+          "readonly": true,
+          "width": 12,
+          "row": "row5",
+          "group": "developer",
+          "permission": "view-api-keys",
+          "roles": ["developer", "admin"]
+        },
+        {
+          "name": "submit",
+          "type": "submit",
+          "value": "Update Profile",
+          "class": "btn btn-primary",
+          "width": 3,
+          "row": "row6"
+        }
+      ]
+    }
+  },
+  "layoutExamples": {
+    "twoColumnLayout": {
+      "description": "Form with two-column layout",
+      "pattern": "6-6 columns per row",
+      "example": [
+        {
+          "row": "row1",
+          "fields": [
+            {"name": "field1", "type": "text", "width": 6},
+            {"name": "field2", "type": "text", "width": 6}
+          ]
+        },
+        {
+          "row": "row2",
+          "fields": [
+            {"name": "field3", "type": "email", "width": 6},
+            {"name": "field4", "type": "tel", "width": 6}
+          ]
+        }
+      ]
+    },
+    "threeColumnLayout": {
+      "description": "Form with three-column layout",
+      "pattern": "4-4-4 columns per row",
+      "example": [
+        {
+          "row": "row1",
+          "fields": [
+            {"name": "city", "type": "text", "width": 4},
+            {"name": "state", "type": "text", "width": 4},
+            {"name": "zip", "type": "text", "width": 4}
+          ]
+        }
+      ]
+    },
+    "mixedLayout": {
+      "description": "Form with mixed column layouts",
+      "pattern": "Various column combinations",
+      "example": [
+        {
+          "row": "row1",
+          "fields": [
+            {"name": "title", "type": "text", "width": 12}
+          ]
+        },
+        {
+          "row": "row2",
+          "fields": [
+            {"name": "first_name", "type": "text", "width": 6},
+            {"name": "last_name", "type": "text", "width": 6}
+          ]
+        },
+        {
+          "row": "row3",
+          "fields": [
+            {"name": "address", "type": "text", "width": 8},
+            {"name": "apt", "type": "text", "width": 4}
+          ]
+        },
+        {
+          "row": "row4",
+          "fields": [
+            {"name": "city", "type": "text", "width": 4},
+            {"name": "state", "type": "text", "width": 4},
+            {"name": "zip", "type": "text", "width": 4}
+          ]
+        }
+      ]
+    }
+  },
+  "hierarchicalOrganization": {
+    "description": "Examples of group → section → row → field hierarchy",
+    "examples": [
+      {
+        "group": "personal_info",
+        "groupTitle": "Personal Information",
+        "groupDescription": "Your basic details",
+        "sections": [
+          {
+            "section": "basic",
+            "sectionTitle": "Basic Details",
+            "rows": [
+              {
+                "row": "row1",
+                "fields": [
+                  {"name": "first_name", "type": "text", "width": 6},
+                  {"name": "last_name", "type": "text", "width": 6}
+                ]
+              },
+              {
+                "row": "row2",
+                "fields": [
+                  {"name": "email", "type": "email", "width": 12}
+                ]
+              }
+            ]
+          },
+          {
+            "section": "contact",
+            "sectionTitle": "Contact Information",
+            "rows": [
+              {
+                "row": "row3",
+                "fields": [
+                  {"name": "phone", "type": "tel", "width": 6},
+                  {"name": "mobile", "type": "tel", "width": 6}
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": "address_info",
+        "groupTitle": "Address",
+        "sections": [
+          {
+            "section": "primary",
+            "sectionTitle": "Primary Address",
+            "rows": [
+              {
+                "row": "row4",
+                "fields": [
+                  {"name": "street", "type": "text", "width": 12}
+                ]
+              },
+              {
+                "row": "row5",
+                "fields": [
+                  {"name": "city", "type": "text", "width": 4},
+                  {"name": "state", "type": "text", "width": 4},
+                  {"name": "zip", "type": "text", "width": 4}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "validationPatterns": {
+    "text": [
+      "required|string|max:255",
+      "required|string|min:3|max:100",
+      "nullable|string|max:500",
+      "required|alpha",
+      "required|alpha_dash"
+    ],
+    "email": [
+      "required|email",
+      "required|email|unique:users,email",
+      "nullable|email",
+      "required|email|confirmed"
+    ],
+    "password": [
+      "required|string|min:8",
+      "required|min:8|confirmed",
+      "required|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$/",
+      "nullable|min:8"
+    ],
+    "number": [
+      "required|numeric",
+      "required|integer|min:0",
+      "required|numeric|min:0|max:100",
+      "nullable|numeric",
+      "required|integer|between:1,100"
+    ],
+    "date": [
+      "required|date",
+      "required|date|after:today",
+      "required|date|before:today",
+      "required|date|after_or_equal:start_date",
+      "nullable|date"
+    ],
+    "file": [
+      "required|file|max:10240",
+      "required|file|mimes:pdf,doc,docx|max:5120",
+      "required|image|max:2048",
+      "nullable|file|mimes:jpg,png,pdf"
+    ],
+    "select": [
+      "required|in:option1,option2,option3",
+      "nullable|in:value1,value2",
+      "required|exists:table,column"
+    ],
+    "checkbox": [
+      "required|accepted",
+      "nullable|boolean",
+      "required|array",
+      "required|array|min:1"
+    ]
+  },
+  "conditionalVisibility": {
+    "description": "Examples of conditional field visibility",
+    "patterns": [
+      {
+        "condition": "show_if",
+        "description": "Show field when another field has specific value",
+        "example": {
+          "name": "company_name",
+          "type": "text",
+          "show_if": "account_type:business"
+        }
+      },
+      {
+        "condition": "hide_if",
+        "description": "Hide field when another field has specific value",
+        "example": {
+          "name": "student_id",
+          "type": "text",
+          "hide_if": "user_type:staff"
+        }
+      },
+      {
+        "condition": "permission",
+        "description": "Show only to users with specific permission",
+        "example": {
+          "name": "salary",
+          "type": "number",
+          "permission": "view-salary"
+        }
+      },
+      {
+        "condition": "roles",
+        "description": "Show only to users with specific roles",
+        "example": {
+          "name": "admin_notes",
+          "type": "textarea",
+          "roles": ["admin", "moderator"]
+        }
+      }
+    ]
+  }
+}
