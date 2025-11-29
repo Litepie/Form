@@ -152,6 +152,129 @@ $form->add(
 );
 ```
 
+### Record Ownership & Team Membership
+
+Show fields based on who created the record or team relationships:
+
+```php
+// In your controller
+$post = Post::find($id);
+
+$form = Form::create()
+    ->forUser(auth()->user())
+    ->add(Form::text('title'))
+    ->add(Form::textarea('content'))
+    
+    // Only visible to the user who created the post
+    ->add(
+        Form::textarea('private_notes')
+            ->label('Private Notes')
+            ->visibleWhen(function ($user) use ($post) {
+                return $user && $user->id === $post->user_id;
+            })
+    )
+    
+    // Visible to owner OR team members
+    ->add(
+        Form::select('status')
+            ->label('Status')
+            ->options(['draft' => 'Draft', 'published' => 'Published'])
+            ->visibleWhen(function ($user) use ($post) {
+                return $user && (
+                    $user->id === $post->user_id ||
+                    $user->team_id === $post->team_id
+                );
+            })
+    )
+    
+    // Visible to owner OR team members OR admins
+    ->add(
+        Form::checkbox('featured')
+            ->label('Featured Post')
+            ->visibleWhen(function ($user) use ($post) {
+                return $user && (
+                    $user->id === $post->user_id ||
+                    $user->team_id === $post->team_id ||
+                    $user->hasRole('admin')
+                );
+            })
+    );
+
+echo $form->render();
+```
+
+### Using Relationships
+
+```php
+$project = Project::with('team')->find($id);
+
+$form = Form::create()
+    ->forUser(auth()->user())
+    ->add(Form::text('name'))
+    
+    // Visible to project owner
+    ->add(
+        Form::number('budget')
+            ->visibleWhen(fn($user) => $user && $user->id === $project->owner_id)
+    )
+    
+    // Visible to team members (using relationship)
+    ->add(
+        Form::select('priority')
+            ->visibleWhen(function ($user) use ($project) {
+                return $user && $project->team->members->contains('id', $user->id);
+            })
+    )
+    
+    // Visible to team leads only
+    ->add(
+        Form::textarea('internal_notes')
+            ->visibleWhen(function ($user) use ($project) {
+                if (!$user) return false;
+                
+                $member = $project->team->members->firstWhere('id', $user->id);
+                return $member && $member->pivot->role === 'lead';
+            })
+    );
+```
+
+### Multiple Record Checks
+
+```php
+$document = Document::find($id);
+$organization = $document->organization;
+
+$form = Form::create()
+    ->forUser(auth()->user())
+    ->add(Form::text('title'))
+    
+    // Check ownership at multiple levels
+    ->add(
+        Form::file('confidential_attachment')
+            ->visibleWhen(function ($user) use ($document, $organization) {
+                if (!$user) return false;
+                
+                // Document owner
+                if ($user->id === $document->created_by) {
+                    return true;
+                }
+                
+                // Organization admin
+                if ($organization->admins->contains('id', $user->id)) {
+                    return true;
+                }
+                
+                // Department head
+                if ($user->department_id === $document->department_id 
+                    && $user->is_department_head) {
+                    return true;
+                }
+                
+                return false;
+            })
+    );
+```
+
 ### Combining Conditions
 
 ```php
