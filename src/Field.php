@@ -167,6 +167,32 @@ abstract class Field
     }
 
     /**
+     * Get or set attributes.
+     */
+    public function attributes(?array $attributes = null): array|self
+    {
+        if ($attributes === null) {
+            return $this->attributes;
+        }
+        
+        $this->attributes = array_merge($this->attributes, $attributes);
+        return $this;
+    }
+
+    /**
+     * Get or set options.
+     */
+    public function options(?array $options = null): array|self
+    {
+        if ($options === null) {
+            return $this->options;
+        }
+        
+        $this->options = $options;
+        return $this;
+    }
+
+    /**
      * Mark field as required.
      */
     public function required(bool $required = true): self
@@ -229,6 +255,19 @@ abstract class Field
     public function getType(): string
     {
         return $this->type;
+    }
+
+    /**
+     * Get or set field type.
+     */
+    public function type(?string $type = null): string|self
+    {
+        if ($type === null) {
+            return $this->type;
+        }
+        
+        $this->type = $type;
+        return $this;
     }
 
     /**
