@@ -211,6 +211,15 @@ abstract class Field
     }
 
     /**
+     * Set field name.
+     */
+    public function name(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
      * Get field type.
      */
     public function getType(): string
