@@ -9,39 +9,22 @@ use Litepie\Form\Field;
  */
 class ColorField extends Field
 {
-    protected $type = 'color';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $attributes = $this->buildAttributes([
-            'type' => 'color',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->value,
-            'class' => $this->buildClasses(),
-        ]);
-
-        return view('litepie-form::fields.color', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'palette' => $this->getAttribute('palette', [
-                '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff',
-                '#000000', '#ffffff', '#808080', '#800000', '#008000', '#000080'
-            ]),
-            'format' => $this->getAttribute('format', 'hex'), // hex, rgb, hsl
-            'allowAlpha' => $this->getAttribute('allowAlpha', false),
-        ]);
+        return 'color';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
+        $attributes = $this->buildAttributes();
         
-        if ($this->getAttribute('format') === 'hex') {
-            $rules[] = 'regex:/^#[a-fA-F0-9]{6}$/';
-        }
-        
-        return $rules;
+        return sprintf(
+            '<input type="color" name="%s" id="%s" value="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? '#000000'),
+            $attributes
+        );
     }
 }
 
@@ -50,51 +33,29 @@ class ColorField extends Field
  */
 class RangeField extends Field
 {
-    protected $type = 'range';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $min = $this->getAttribute('min', 0);
-        $max = $this->getAttribute('max', 100);
-        $step = $this->getAttribute('step', 1);
-        $value = $this->value ?: $min;
-
-        $attributes = $this->buildAttributes([
-            'type' => 'range',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $value,
-            'min' => $min,
-            'max' => $max,
-            'step' => $step,
-            'class' => $this->buildClasses(),
-        ]);
-
-        return view('litepie-form::fields.range', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'showValue' => $this->getAttribute('showValue', true),
-            'valuePrefix' => $this->getAttribute('valuePrefix', ''),
-            'valueSuffix' => $this->getAttribute('valueSuffix', ''),
-            'ticks' => $this->getAttribute('ticks', []),
-        ]);
+        return 'range';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
+        $min = $this->attributes['min'] ?? 0;
+        $max = $this->attributes['max'] ?? 100;
+        $step = $this->attributes['step'] ?? 1;
         
-        if ($min = $this->getAttribute('min')) {
-            $rules[] = "min:$min";
-        }
+        $attributes = $this->buildAttributes();
         
-        if ($max = $this->getAttribute('max')) {
-            $rules[] = "max:$max";
-        }
-        
-        $rules[] = 'numeric';
-        
-        return $rules;
+        return sprintf(
+            '<input type="range" name="%s" id="%s" value="%s" min="%s" max="%s" step="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? $min),
+            htmlspecialchars($min),
+            htmlspecialchars($max),
+            htmlspecialchars($step),
+            $attributes
+        );
     }
 }
 
@@ -103,35 +64,30 @@ class RangeField extends Field
  */
 class RadioField extends Field
 {
-    protected $type = 'radio';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $options = $this->getAttribute('options', []);
-        $inline = $this->getAttribute('inline', false);
-        $value = $this->value;
-
-        return view('litepie-form::fields.radio', [
-            'field' => $this,
-            'options' => $options,
-            'value' => $value,
-            'inline' => $inline,
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'class' => $this->buildClasses(),
-        ]);
+        return 'radio';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
-        
-        if ($options = $this->getAttribute('options')) {
-            $validValues = array_keys($options);
-            $rules[] = 'in:' . implode(',', $validValues);
+        $html = '';
+        foreach ($this->options as $optionValue => $optionText) {
+            $checked = $this->value == $optionValue ? ' checked' : '';
+            $id = $this->getId() . '_' . $optionValue;
+            
+            $html .= sprintf(
+                '<div class="form-check"><input type="radio" name="%s" id="%s" value="%s"%s class="form-check-input"><label for="%s" class="form-check-label">%s</label></div>',
+                htmlspecialchars($this->name),
+                $id,
+                htmlspecialchars($optionValue),
+                $checked,
+                $id,
+                htmlspecialchars($optionText)
+            );
         }
         
-        return $rules;
+        return $html;
     }
 }
 
@@ -140,62 +96,44 @@ class RadioField extends Field
  */
 class CheckboxField extends Field
 {
-    protected $type = 'checkbox';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $options = $this->getAttribute('options', []);
-        $inline = $this->getAttribute('inline', false);
-        $value = $this->value;
-        
-        // Handle single checkbox vs checkbox group
-        if (empty($options)) {
-            return $this->renderSingleCheckbox();
-        }
-
-        return view('litepie-form::fields.checkbox', [
-            'field' => $this,
-            'options' => $options,
-            'value' => is_array($value) ? $value : [$value],
-            'inline' => $inline,
-            'name' => $this->name . '[]',
-            'id' => $this->getAttribute('id', $this->name),
-            'class' => $this->buildClasses(),
-        ]);
+        return 'checkbox';
     }
 
-    protected function renderSingleCheckbox()
+    public function render(): string
     {
-        $attributes = $this->buildAttributes([
-            'type' => 'checkbox',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->getAttribute('value', '1'),
-            'class' => $this->buildClasses(),
-        ]);
-
-        if ($this->value) {
-            $attributes['checked'] = 'checked';
-        }
-
-        return view('litepie-form::fields.checkbox-single', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'checkboxLabel' => $this->getAttribute('checkboxLabel', ''),
-        ]);
-    }
-
-    public function getValidationRules()
-    {
-        $rules = parent::getValidationRules();
-        
-        if ($options = $this->getAttribute('options')) {
-            $validValues = array_keys($options);
-            $rules[] = 'array';
-            $rules[] = 'in:' . implode(',', $validValues);
+        if (empty($this->options)) {
+            // Single checkbox
+            $checked = $this->value ? ' checked' : '';
+            return sprintf(
+                '<input type="checkbox" name="%s" id="%s" value="1"%s class="form-check-input">',
+                htmlspecialchars($this->name),
+                $this->getId(),
+                $checked
+            );
         }
         
-        return $rules;
+        // Checkbox group
+        $html = '';
+        $values = is_array($this->value) ? $this->value : [$this->value];
+        
+        foreach ($this->options as $optionValue => $optionText) {
+            $checked = in_array($optionValue, $values) ? ' checked' : '';
+            $id = $this->getId() . '_' . $optionValue;
+            
+            $html .= sprintf(
+                '<div class="form-check"><input type="checkbox" name="%s[]" id="%s" value="%s"%s class="form-check-input"><label for="%s" class="form-check-label">%s</label></div>',
+                htmlspecialchars($this->name),
+                $id,
+                htmlspecialchars($optionValue),
+                $checked,
+                $id,
+                htmlspecialchars($optionText)
+            );
+        }
+        
+        return $html;
     }
 }
 
@@ -204,42 +142,23 @@ class CheckboxField extends Field
  */
 class TagsField extends Field
 {
-    protected $type = 'tags';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $value = $this->value;
-        $tags = is_array($value) ? $value : explode(',', $value);
-        $suggestions = $this->getAttribute('suggestions', []);
-        $maxTags = $this->getAttribute('maxTags', null);
-        $allowCustom = $this->getAttribute('allowCustom', true);
-
-        return view('litepie-form::fields.tags', [
-            'field' => $this,
-            'tags' => array_filter($tags),
-            'suggestions' => $suggestions,
-            'maxTags' => $maxTags,
-            'allowCustom' => $allowCustom,
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'class' => $this->buildClasses(),
-            'placeholder' => $this->getAttribute('placeholder', 'Type and press Enter...'),
-        ]);
+        return 'text';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
+        $tags = is_array($this->value) ? implode(',', $this->value) : $this->value;
+        $attributes = $this->buildAttributes();
         
-        if ($maxTags = $this->getAttribute('maxTags')) {
-            $rules[] = "max:$maxTags";
-        }
-        
-        if (!$this->getAttribute('allowCustom', true) && $suggestions = $this->getAttribute('suggestions')) {
-            $rules[] = 'in:' . implode(',', $suggestions);
-        }
-        
-        return $rules;
+        return sprintf(
+            '<input type="text" name="%s" id="%s" value="%s" %s data-role="tagsinput">',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($tags ?? ''),
+            $attributes
+        );
     }
 }
 
@@ -248,34 +167,22 @@ class TagsField extends Field
  */
 class TimeField extends Field
 {
-    protected $type = 'time';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $attributes = $this->buildAttributes([
-            'type' => 'time',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->value,
-            'class' => $this->buildClasses(),
-            'step' => $this->getAttribute('step', '60'), // seconds
-        ]);
-
-        return view('litepie-form::fields.time', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'format' => $this->getAttribute('format', '24'), // 12 or 24 hour
-            'minuteStep' => $this->getAttribute('minuteStep', 1),
-            'showSeconds' => $this->getAttribute('showSeconds', false),
-        ]);
+        return 'time';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
-        $rules[] = 'date_format:H:i' . ($this->getAttribute('showSeconds') ? ':s' : '');
+        $attributes = $this->buildAttributes();
         
-        return $rules;
+        return sprintf(
+            '<input type="time" name="%s" id="%s" value="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? ''),
+            $attributes
+        );
     }
 }
 
@@ -284,30 +191,22 @@ class TimeField extends Field
  */
 class WeekField extends Field
 {
-    protected $type = 'week';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $attributes = $this->buildAttributes([
-            'type' => 'week',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->value,
-            'class' => $this->buildClasses(),
-        ]);
-
-        return view('litepie-form::fields.week', [
-            'field' => $this,
-            'attributes' => $attributes,
-        ]);
+        return 'week';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
-        $rules[] = 'date_format:Y-\WW';
+        $attributes = $this->buildAttributes();
         
-        return $rules;
+        return sprintf(
+            '<input type="week" name="%s" id="%s" value="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? ''),
+            $attributes
+        );
     }
 }
 
@@ -316,30 +215,22 @@ class WeekField extends Field
  */
 class MonthField extends Field
 {
-    protected $type = 'month';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $attributes = $this->buildAttributes([
-            'type' => 'month',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->value,
-            'class' => $this->buildClasses(),
-        ]);
-
-        return view('litepie-form::fields.month', [
-            'field' => $this,
-            'attributes' => $attributes,
-        ]);
+        return 'month';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
-        $rules[] = 'date_format:Y-m';
+        $attributes = $this->buildAttributes();
         
-        return $rules;
+        return sprintf(
+            '<input type="month" name="%s" id="%s" value="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? ''),
+            $attributes
+        );
     }
 }
 
@@ -348,37 +239,27 @@ class MonthField extends Field
  */
 class DateTimeField extends Field
 {
-    protected $type = 'datetime-local';
+    protected function getFieldType(): string
+    {
+        return 'datetime-local';
+    }
 
-    protected function renderField()
+    public function render(): string
     {
         $value = $this->value;
         if ($value && !str_contains($value, 'T')) {
-            // Convert from database format to HTML datetime-local format
             $value = date('Y-m-d\TH:i', strtotime($value));
         }
-
-        $attributes = $this->buildAttributes([
-            'type' => 'datetime-local',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $value,
-            'class' => $this->buildClasses(),
-        ]);
-
-        return view('litepie-form::fields.datetime', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'timezone' => $this->getAttribute('timezone', 'UTC'),
-        ]);
-    }
-
-    public function getValidationRules()
-    {
-        $rules = parent::getValidationRules();
-        $rules[] = 'date';
         
-        return $rules;
+        $attributes = $this->buildAttributes();
+        
+        return sprintf(
+            '<input type="datetime-local" name="%s" id="%s" value="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($value ?? ''),
+            $attributes
+        );
     }
 }
 
@@ -387,27 +268,21 @@ class DateTimeField extends Field
  */
 class GalleryField extends Field
 {
-    protected $type = 'gallery';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $maxFiles = $this->getAttribute('maxFiles', 10);
-        $accept = $this->getAttribute('accept', 'image/*');
-        $sortable = $this->getAttribute('sortable', true);
-        $existingFiles = $this->value ?: [];
+        return 'file';
+    }
 
-        return view('litepie-form::fields.gallery', [
-            'field' => $this,
-            'maxFiles' => $maxFiles,
-            'accept' => $accept,
-            'sortable' => $sortable,
-            'existingFiles' => $existingFiles,
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'class' => $this->buildClasses(),
-            'uploadUrl' => $this->getAttribute('uploadUrl', '/upload'),
-            'deleteUrl' => $this->getAttribute('deleteUrl', '/delete'),
-        ]);
+    public function render(): string
+    {
+        $attributes = $this->buildAttributes();
+        
+        return sprintf(
+            '<input type="file" name="%s[]" id="%s" accept="image/*" multiple %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            $attributes
+        );
     }
 }
 
@@ -416,38 +291,26 @@ class GalleryField extends Field
  */
 class RatingField extends Field
 {
-    protected $type = 'rating';
-
-    protected function renderField()
+    protected function getFieldType(): string
     {
-        $max = $this->getAttribute('max', 5);
-        $allowHalf = $this->getAttribute('allowHalf', false);
-        $readonly = $this->getAttribute('readonly', false);
-        $value = (float) $this->value;
-
-        return view('litepie-form::fields.rating', [
-            'field' => $this,
-            'max' => $max,
-            'allowHalf' => $allowHalf,
-            'readonly' => $readonly,
-            'value' => $value,
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'class' => $this->buildClasses(),
-            'size' => $this->getAttribute('size', 'medium'), // small, medium, large
-        ]);
+        return 'number';
     }
 
-    public function getValidationRules()
+    public function render(): string
     {
-        $rules = parent::getValidationRules();
-        $rules[] = 'numeric';
-        $rules[] = 'min:0';
+        $max = $this->attributes['max'] ?? 5;
+        $step = $this->attributes['allowHalf'] ?? false ? '0.5' : '1';
         
-        if ($max = $this->getAttribute('max', 5)) {
-            $rules[] = "max:$max";
-        }
+        $attributes = $this->buildAttributes();
         
-        return $rules;
+        return sprintf(
+            '<input type="number" name="%s" id="%s" value="%s" min="0" max="%s" step="%s" %s>',
+            htmlspecialchars($this->name),
+            $this->getId(),
+            htmlspecialchars($this->value ?? '0'),
+            htmlspecialchars($max),
+            $step,
+            $attributes
+        );
     }
 }
