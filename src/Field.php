@@ -211,10 +211,14 @@ abstract class Field
     }
 
     /**
-     * Set field name.
+     * Get or set field name.
      */
-    public function name(string $name): self
+    public function name(?string $name = null): string|self
     {
+        if ($name === null) {
+            return $this->name;
+        }
+        
         $this->name = $name;
         return $this;
     }
