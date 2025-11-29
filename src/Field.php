@@ -67,6 +67,36 @@ abstract class Field
     protected array $errors = [];
 
     /**
+     * Whether field is visible.
+     */
+    protected bool $visible = true;
+
+    /**
+     * Whether field is readonly.
+     */
+    protected bool $readonly = false;
+
+    /**
+     * Whether field is disabled.
+     */
+    protected bool $disabled = false;
+
+    /**
+     * Visibility condition callback.
+     */
+    protected ?\Closure $visibilityCondition = null;
+
+    /**
+     * Permission/ability required to view this field.
+     */
+    protected ?string $permission = null;
+
+    /**
+     * Roles allowed to view this field.
+     */
+    protected array $roles = [];
+
+    /**
      * Create a new field instance.
      */
     public function __construct(string $name, array $options = [])
@@ -290,6 +320,137 @@ abstract class Field
     {
         $this->errors = $errors;
         return $this;
+    }
+
+    /**
+     * Hide the field.
+     */
+    public function hide(): self
+    {
+        $this->visible = false;
+        return $this;
+    }
+
+    /**
+     * Show the field.
+     */
+    public function show(): self
+    {
+        $this->visible = true;
+        return $this;
+    }
+
+    /**
+     * Set field visibility.
+     */
+    public function visible(bool $visible = true): self
+    {
+        $this->visible = $visible;
+        return $this;
+    }
+
+    /**
+     * Set visibility condition (callback).
+     */
+    public function visibleWhen(\Closure $callback): self
+    {
+        $this->visibilityCondition = $callback;
+        return $this;
+    }
+
+    /**
+     * Set visibility based on user permission.
+     */
+    public function can(string $permission): self
+    {
+        $this->permission = $permission;
+        return $this;
+    }
+
+    /**
+     * Set visibility based on user roles.
+     */
+    public function roles(array|string $roles): self
+    {
+        $this->roles = is_array($roles) ? $roles : [$roles];
+        return $this;
+    }
+
+    /**
+     * Make field readonly.
+     */
+    public function readonly(bool $readonly = true): self
+    {
+        $this->readonly = $readonly;
+        return $this;
+    }
+
+    /**
+     * Make field disabled.
+     */
+    public function disabled(bool $disabled = true): self
+    {
+        $this->disabled = $disabled;
+        return $this;
+    }
+
+    /**
+     * Check if field is visible.
+     */
+    public function isVisible(?object $user = null): bool
+    {
+        // Check basic visibility flag
+        if (!$this->visible) {
+            return false;
+        }
+
+        // Check permission
+        if ($this->permission && $user) {
+            if (method_exists($user, 'can') && !$user->can($this->permission)) {
+                return false;
+            }
+        }
+
+        // Check roles
+        if (!empty($this->roles) && $user) {
+            if (method_exists($user, 'hasAnyRole') && !$user->hasAnyRole($this->roles)) {
+                return false;
+            } elseif (method_exists($user, 'hasRole')) {
+                $hasRole = false;
+                foreach ($this->roles as $role) {
+                    if ($user->hasRole($role)) {
+                        $hasRole = true;
+                        break;
+                    }
+                }
+                if (!$hasRole) {
+                    return false;
+                }
+            }
+        }
+
+        // Check visibility condition
+        if ($this->visibilityCondition) {
+            return call_user_func($this->visibilityCondition, $user);
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if field is readonly.
+     */
+    public function isReadonly(): bool
+    {
+        return $this->readonly;
+    }
+
+    /**
+     * Check if field is disabled.
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
     }
 
     /**
@@ -535,6 +696,14 @@ abstract class Field
         
         if ($this->required) {
             $attributes['required'] = true;
+        }
+        
+        if ($this->readonly) {
+            $attributes['readonly'] = true;
+        }
+        
+        if ($this->disabled) {
+            $attributes['disabled'] = true;
         }
         
         $parts = [];

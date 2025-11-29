@@ -2,6 +2,74 @@
 
 This document shows how to use Litepie Form with client-side frameworks like Vue.js, React, Angular, and others by converting forms to arrays and JSON.
 
+## 🔐 Field Visibility & Permissions
+
+Forms support visibility control based on user permissions, roles, and custom conditions. This works seamlessly with `toArray()` and `toJson()`:
+
+### Setting User Once (Recommended)
+
+```php
+use Litepie\Form\Facades\Form;
+
+// Set user once and all operations will use it
+$form = Form::create()
+    ->action('/api/users')
+    ->method('POST')
+    ->forUser(auth()->user())  // Set user once here
+    
+    // Visible to everyone
+    ->add(Form::text('name')->label('Name'))
+    ->add(Form::email('email')->label('Email'))
+    
+    // Only visible to users with 'view-salary' permission
+    ->add(
+        Form::number('salary')
+            ->label('Salary')
+            ->can('view-salary')
+    )
+    
+    // Only visible to managers and admins
+    ->add(
+        Form::select('department')
+            ->label('Department')
+            ->options(['sales' => 'Sales', 'engineering' => 'Engineering'])
+            ->roles(['manager', 'admin'])
+    );
+
+// All operations automatically use the stored user
+$html = $form->render();          // Uses auth()->user()
+$array = $form->toArray();        // Uses auth()->user()
+$json = $form->toJson();          // Uses auth()->user()
+
+// Return to client-side framework
+return response()->json([
+    'form' => $form->toArray()    // Already filtered by user
+]);
+```
+
+### Passing User Per Operation
+
+You can also pass the user to individual operations:
+
+```php
+$form = Form::create()
+    ->add(Form::text('name'))
+    ->add(Form::number('salary')->can('view-salary'));
+
+// Pass user to specific operations
+$array = $form->toArray(auth()->user());
+$json = $form->toJson(auth()->user());
+$html = $form->render(auth()->user());
+
+// Override stored user
+$adminUser = User::find(1);
+$adminArray = $form->toArray($adminUser);  // Uses admin user instead
+```
+
+**Important:** When passing a user to `toArray()` or `toJson()`, only fields that pass the visibility checks will be included in the output. This ensures your client-side application only receives fields the user is authorized to see.
+
+For more details on visibility controls, see [VISIBILITY.md](../VISIBILITY.md).
+
 ## 🔧 Converting Forms to Arrays/JSON
 
 ### Basic Form to Array

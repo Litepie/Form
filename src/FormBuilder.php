@@ -80,6 +80,26 @@ class FormBuilder
     protected bool $multiStep = false;
 
     /**
+     * The user for visibility checks.
+     */
+    protected ?object $user = null;
+
+    /**
+     * Cache storage for form outputs.
+     */
+    protected array $cache = [];
+
+    /**
+     * Cache TTL in seconds (default: 1 hour).
+     */
+    protected int $cacheTtl = 3600;
+
+    /**
+     * Whether caching is enabled.
+     */
+    protected bool $cacheEnabled = false;
+
+    /**
      * Create a new form builder instance.
      */
     public function __construct(Container $app)
@@ -129,7 +149,92 @@ class FormBuilder
     }
 
     /**
-     * Add form attribute.
+     * Set the user for visibility checks.
+     */
+    public function forUser(?object $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * Get the current user.
+     */
+    public function getUser(): ?object
+    {
+        return $this->user;
+    }
+
+    /**
+     * Enable caching with optional TTL.
+     */
+    public function cache(int $ttl = 3600): self
+    {
+        $this->cacheEnabled = true;
+        $this->cacheTtl = $ttl;
+        return $this;
+    }
+
+    /**
+     * Disable caching.
+     */
+    public function withoutCache(): self
+    {
+        $this->cacheEnabled = false;
+        $this->cache = [];
+        return $this;
+    }
+
+    /**
+     * Clear all cached outputs.
+     */
+    public function clearCache(): self
+    {
+        $this->cache = [];
+        return $this;
+    }
+
+    /**
+     * Get or set cached value.
+     */
+    protected function cached(string $key, callable $callback)
+    {
+        if (!$this->cacheEnabled) {
+            return $callback();
+        }
+
+        // Check if cache exists and is not expired
+        if (isset($this->cache[$key])) {
+            $cacheData = $this->cache[$key];
+            if (time() < $cacheData['expires_at']) {
+                return $cacheData['value'];
+            }
+            // Cache expired, remove it
+            unset($this->cache[$key]);
+        }
+
+        // Generate new value and cache it
+        $value = $callback();
+        $this->cache[$key] = [
+            'value' => $value,
+            'expires_at' => time() + $this->cacheTtl,
+            'created_at' => time()
+        ];
+
+        return $value;
+    }
+
+    /**
+     * Generate cache key based on operation and user.
+     */
+    protected function getCacheKey(string $operation, ?object $user = null): string
+    {
+        $userKey = $user ? spl_object_hash($user) : 'no_user';
+        return $operation . '_' . $userKey;
+    }
+
+    /**
+     * Set form theme.
      */
     public function attribute(string $key, mixed $value): self
     {
@@ -191,6 +296,24 @@ class FormBuilder
     }
 
     /**
+     * Get visible fields only.
+     */
+    public function visibleFields(?object $user = null): Collection
+    {
+        return $this->fields->filter(function ($field) use ($user) {
+            return $field->isVisible($user);
+        });
+    }
+
+    /**
+     * Get form data.
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    /**
      * Get validation rules.
      */
     public function rules(): array
@@ -214,59 +337,91 @@ class FormBuilder
     /**
      * Render the form.
      */
-    public function render(): string
+    public function render(?object $user = null): string
     {
-        return $this->app->make('form.renderer')
-            ->render($this);
+        // Use provided user or fall back to stored user
+        $user = $user ?? $this->user;
+        
+        return $this->cached($this->getCacheKey('render', $user), function() use ($user) {
+            // Store user for renderer access
+            if ($user !== null) {
+                $this->data['_user'] = $user;
+            }
+            
+            return $this->app->make('form.renderer')
+                ->render($this);
+        });
     }
 
     /**
      * Convert form to array for client-side frameworks (Vue, React, etc.)
      */
-    public function toArray(): array
+    public function toArray(?object $user = null): array
     {
-        return [
-            'config' => [
-                'action' => $this->action,
-                'method' => $this->method,
-                'enctype' => $this->hasFiles ? 'multipart/form-data' : 'application/x-www-form-urlencoded',
-                'csrf' => $this->csrf,
-                'ajax' => $this->ajax,
-                'theme' => $this->theme,
-                'multiStep' => $this->multiStep,
-                'attributes' => $this->attributes,
-            ],
-            'fields' => $this->getFieldsArray(),
-            'validation' => [
-                'rules' => $this->getValidationRules(),
-                'messages' => $this->getValidationMessages(),
-            ],
-            'data' => $this->data,
-            'meta' => [
-                'fieldCount' => $this->fields->count(),
-                'requiredFields' => $this->getRequiredFields(),
-                'hasFileUploads' => $this->hasFileUploads(),
-                'steps' => $this->getSteps(),
-            ]
-        ];
+        // Use provided user or fall back to stored user
+        $user = $user ?? $this->user;
+        
+        return $this->cached($this->getCacheKey('toArray', $user), function() use ($user) {
+            // Get visible fields if user is provided
+            $fields = $user ? $this->visibleFields($user) : $this->fields;
+            
+            return [
+                'config' => [
+                    'action' => $this->action,
+                    'method' => $this->method,
+                    'enctype' => $this->hasFiles ? 'multipart/form-data' : 'application/x-www-form-urlencoded',
+                    'csrf' => $this->csrf,
+                    'ajax' => $this->ajax,
+                    'theme' => $this->theme,
+                    'multiStep' => $this->multiStep,
+                    'attributes' => $this->attributes,
+                ],
+                'fields' => $this->getFieldsArray($user),
+                'validation' => [
+                    'rules' => $this->getValidationRules($user),
+                    'messages' => $this->getValidationMessages($user),
+                ],
+                'data' => $this->data,
+                'meta' => [
+                    'fieldCount' => $fields->count(),
+                    'requiredFields' => $this->getRequiredFields($user),
+                    'hasFileUploads' => $this->hasFileUploads(),
+                    'steps' => $this->getSteps($user),
+                ]
+            ];
+        });
     }
 
     /**
      * Convert form to JSON for API responses
      */
-    public function toJson(int $options = 0): string
+    public function toJson(?object $user = null, int $options = 0): string
     {
-        return json_encode($this->toArray(), $options);
+        // Use provided user or fall back to stored user
+        $user = $user ?? $this->user;
+        
+        $cacheKey = $this->getCacheKey('toJson_' . $options, $user);
+        
+        return $this->cached($cacheKey, function() use ($user, $options) {
+            return json_encode($this->toArray($user), $options);
+        });
     }
 
     /**
      * Get fields as array with all metadata
      */
-    protected function getFieldsArray(): array
+    protected function getFieldsArray(?object $user = null): array
     {
         $fieldsArray = [];
         
-        foreach ($this->fields as $name => $field) {
+        // Get visible fields if user is provided
+        $fields = $user ? $this->visibleFields($user) : $this->fields;
+        
+        foreach ($fields as $name => $field) {
+            // Double-check visibility
+            if ($user && !$field->isVisible($user)) {
+                continue;
+            }
             $fieldsArray[$name] = [
                 'name' => $field->getName(),
                 'type' => $field->getType(),
@@ -367,9 +522,11 @@ class FormBuilder
     /**
      * Get list of required field names
      */
-    protected function getRequiredFields(): array
+    protected function getRequiredFields(?object $user = null): array
     {
-        return $this->fields->filter(function ($field) {
+        $fields = $user ? $this->visibleFields($user) : $this->fields;
+        
+        return $fields->filter(function ($field) {
             return $field->isRequired();
         })->keys()->toArray();
     }
@@ -387,14 +544,16 @@ class FormBuilder
     /**
      * Get form steps for multi-step forms
      */
-    protected function getSteps(): array
+    protected function getSteps(?object $user = null): array
     {
         if (!$this->multiStep) {
             return [];
         }
 
+        $fields = $user ? $this->visibleFields($user) : $this->fields;
+        
         $steps = [];
-        foreach ($this->fields as $field) {
+        foreach ($fields as $field) {
             $step = $field->getStep() ?? 1;
             if (!isset($steps[$step])) {
                 $steps[$step] = [
@@ -412,10 +571,12 @@ class FormBuilder
     /**
      * Get validation rules for all fields
      */
-    protected function getValidationRules(): array
+    protected function getValidationRules(?object $user = null): array
     {
+        $fields = $user ? $this->visibleFields($user) : $this->fields;
+        
         $rules = [];
-        foreach ($this->fields as $name => $field) {
+        foreach ($fields as $name => $field) {
             if ($fieldRules = $field->getRules()) {
                 $rules[$name] = $fieldRules;
             }
@@ -426,10 +587,12 @@ class FormBuilder
     /**
      * Get validation messages for all fields
      */
-    protected function getValidationMessages(): array
+    protected function getValidationMessages(?object $user = null): array
     {
+        $fields = $user ? $this->visibleFields($user) : $this->fields;
+        
         $messages = [];
-        foreach ($this->fields as $name => $field) {
+        foreach ($fields as $name => $field) {
             if ($fieldMessages = $field->getMessages()) {
                 foreach ($fieldMessages as $rule => $message) {
                     $messages["$name.$rule"] = $message;

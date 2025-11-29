@@ -30,9 +30,20 @@ class FormRenderer
      */
     public function render(FormBuilder $form): string
     {
+        // Get user from form data if available
+        $user = $form->getData()['_user'] ?? null;
+        
         $html = $form->open();
         
-        foreach ($form->fields() as $field) {
+        // Get visible fields only if user is provided
+        $fields = $user ? $form->visibleFields($user) : $form->fields();
+        
+        foreach ($fields as $field) {
+            // Skip hidden fields
+            if (!$field->isVisible($user)) {
+                continue;
+            }
+            
             $html .= $this->renderField($field);
         }
         

@@ -24,22 +24,16 @@ A comprehensive, production-ready Laravel form builder package inspired by the o
 ## ✨ Features
 
 - **🚀 Laravel 12 Ready**: Built for Laravel 11+ with full Laravel 12 compatibility
-- **🎨 Multiple UI Frameworks*## 🔒 Security
-
-If you discover security vulnerabilities, please review our [Security Policy](SECURITY.md) and send an email to security@litepie.com instead of using the issue tracker.Bootstr## 📚 Documentation
-
-- **[Documentation Index](doc/index.md)** - Complete documentation overview and navigation
-- **[Examples](doc/examples.md)** - Comprehensive examples for all field types and features
-- **[Container Examples](doc/container-examples.md)** - Multi-form container usage and patterns
-- **[Client-Side Examples](doc/client-side-examples.md)** - JavaScript integration and API usage
-- **[Caching Guide](doc/caching.md)** - Performance optimization with cachingBootstrap 4, Tailwind CSS, and custom themes
+- **🎨 Multiple UI Frameworks**: Bootstrap 5, Bootstrap 4, Tailwind CSS, and custom themes
 - **📝 30+ Field Types**: Complete field library including advanced types like rich text, maps, file uploads
+- **🔐 Field Visibility Control**: Permission-based, role-based, and conditional field visibility
 - **✅ Advanced Validation**: Real-time validation, conditional rules, custom validators
 - **🔀 Conditional Logic**: Dynamic field visibility, validation, and multi-step forms
 - **📁 File Management**: Drag & drop uploads, image cropping, gallery management, cloud storage
 - **📦 Form Container**: Manage multiple forms with tabbed, accordion, or stacked interfaces
 - **♿ Accessibility**: WCAG 2.1 AA compliant with full screen reader support
 - **⚡ Performance**: Optimized rendering, asset bundling, lazy loading
+- **🌐 Client-Side Ready**: Full support for Vue.js, React, Angular with `toArray()` and `toJson()`
 - **🧪 Well Tested**: Comprehensive test suite with 95%+ code coverage
 - **🎯 Developer Friendly**: Fluent API, extensive documentation, helper functions
 
@@ -168,6 +162,99 @@ $quickForm = form_quick([
 // Standalone field
 $nameField = form_field('name', 'text', [
     'label' => 'Full Name',
+    'required' => true
+]);
+```
+
+### Field Visibility & Permissions
+
+Control field visibility based on user permissions and roles:
+
+```php
+use Litepie\Form\Facades\Form;
+
+$userForm = Form::create()
+    ->action('/users')
+    ->forUser(auth()->user())  // Set user for all operations
+    
+    // Basic fields - visible to everyone
+    ->add(Form::text('name')->label('Name'))
+    ->add(Form::email('email')->label('Email'))
+    
+    // Only visible with permission
+    ->add(
+        Form::number('salary')
+            ->label('Salary')
+            ->can('view-salary')
+    )
+    
+    // Only visible to specific roles
+    ->add(
+        Form::select('department')
+            ->label('Department')
+            ->options(['sales' => 'Sales', 'engineering' => 'Engineering'])
+            ->roles(['manager', 'admin'])
+    )
+    
+    // Custom visibility logic
+    ->add(
+        Form::text('api_key')
+            ->label('API Key')
+            ->visibleWhen(fn($user) => $user && $user->isPremium())
+    );
+
+// Render only visible fields
+echo $userForm->render();
+
+// For client-side (Vue, React, etc.) - only visible fields included
+return response()->json([
+    'form' => $userForm->toArray()
+]);
+```
+
+See [VISIBILITY.md](VISIBILITY.md) for complete visibility control documentation.
+
+### Performance: Caching Form Output
+
+Enable caching for forms that don't change frequently:
+
+```php
+use Litepie\Form\Facades\Form;
+
+// Enable caching with default TTL (1 hour)
+$form = Form::create()
+    ->forUser(auth()->user())
+    ->cache()  // Enable caching
+    ->add(Form::text('name'))
+    ->add(Form::email('email'))
+    ->add(Form::number('salary')->can('view-salary'));
+
+// First render - generates and caches output
+$html = $form->render();  // Slow
+
+// Subsequent renders - returns cached output
+$html = $form->render();  // Fast (from cache)
+
+// Custom cache TTL (30 minutes)
+$form->cache(1800);
+
+// Cache is automatically scoped per user
+$adminForm = $form->render($adminUser);    // Cached for admin
+$managerForm = $form->render($managerUser); // Cached for manager
+
+// Clear cache when needed
+$form->clearCache();
+
+// Disable caching
+$form->withoutCache();
+```
+
+**Use caching for:**
+- Forms with many fields and complex visibility logic
+- API endpoints serving the same form to many users
+- Admin panels with heavy permission checks
+
+## 📝 Field Types
     'required' => true
 ]);
 
