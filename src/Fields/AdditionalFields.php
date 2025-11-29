@@ -383,40 +383,6 @@ class DateTimeField extends Field
 }
 
 /**
- * URL field
- */
-class UrlField extends Field
-{
-    protected $type = 'url';
-
-    protected function renderField()
-    {
-        $attributes = $this->buildAttributes([
-            'type' => 'url',
-            'name' => $this->name,
-            'id' => $this->getAttribute('id', $this->name),
-            'value' => $this->value,
-            'class' => $this->buildClasses(),
-            'placeholder' => $this->getAttribute('placeholder', 'https://example.com'),
-        ]);
-
-        return view('litepie-form::fields.url', [
-            'field' => $this,
-            'attributes' => $attributes,
-            'allowedSchemes' => $this->getAttribute('allowedSchemes', ['http', 'https']),
-        ]);
-    }
-
-    public function getValidationRules()
-    {
-        $rules = parent::getValidationRules();
-        $rules[] = 'url';
-        
-        return $rules;
-    }
-}
-
-/**
  * Gallery/Multiple Images field
  */
 class GalleryField extends Field
