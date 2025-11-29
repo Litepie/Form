@@ -100,6 +100,31 @@ class FormBuilder
     protected bool $cacheEnabled = false;
 
     /**
+     * Row counter for auto-generating row IDs.
+     */
+    protected int $rowCounter = 0;
+
+    /**
+     * Group counter for auto-generating group IDs.
+     */
+    protected int $groupCounter = 0;
+
+    /**
+     * Section counter for auto-generating section IDs.
+     */
+    protected int $sectionCounter = 0;
+
+    /**
+     * Current active group.
+     */
+    protected ?string $currentGroup = null;
+
+    /**
+     * Current active section.
+     */
+    protected ?string $currentSection = null;
+
+    /**
      * Create a new form builder instance.
      */
     public function __construct(Container $app)
@@ -163,6 +188,15 @@ class FormBuilder
     public function getUser(): ?object
     {
         return $this->user;
+    }
+
+    /**
+     * Set default field width for this form.
+     */
+    public function defaultWidth(int $width): self
+    {
+        Field::setDefaultWidth($width);
+        return $this;
     }
 
     /**
@@ -276,6 +310,133 @@ class FormBuilder
     {
         $this->fields->forget($name);
         unset($this->rules[$name]);
+        return $this;
+    }
+
+    /**
+     * Add multiple fields in a row.
+     */
+    public function row(array $fields, ?string $rowId = null): self
+    {
+        // Auto-generate row ID if not provided
+        if ($rowId === null) {
+            $this->rowCounter++;
+            $rowId = 'row' . $this->rowCounter;
+        }
+
+        // Add each field with the same row identifier
+        foreach ($fields as $field) {
+            if ($field instanceof Field) {
+                // Set the row identifier
+                $field->row($rowId);
+                
+                // Set current group and section if active
+                if ($this->currentGroup) {
+                    $field->group($this->currentGroup);
+                }
+                if ($this->currentSection) {
+                    $field->section($this->currentSection);
+                }
+                
+                // Add field to the form
+                $this->fields->put($field->getName(), $field);
+                
+                // Extract validation rules if any
+                if ($rules = $field->getRules()) {
+                    $this->rules[$field->getName()] = $rules;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Start a new group with optional title and description.
+     */
+    public function group(string $groupId, ?string $title = null, ?string $description = null): self
+    {
+        $this->currentGroup = $groupId;
+        $this->currentSection = null; // Reset section when starting new group
+        
+        return $this;
+    }
+
+    /**
+     * Start a new section within current group.
+     */
+    public function section(string $sectionId, ?string $title = null, ?string $description = null): self
+    {
+        $this->currentSection = $sectionId;
+        
+        return $this;
+    }
+
+    /**
+     * End the current group.
+     */
+    public function endGroup(): self
+    {
+        $this->currentGroup = null;
+        $this->currentSection = null;
+        
+        return $this;
+    }
+
+    /**
+     * End the current section.
+     */
+    public function endSection(): self
+    {
+        $this->currentSection = null;
+        
+        return $this;
+    }
+
+    /**
+     * Add a divider with optional label.
+     */
+    public function divider(?string $label = null, ?string $group = null, ?string $section = null): self
+    {
+        // Create a pseudo-field for the divider
+        $dividerName = 'divider_' . (count($this->fields) + 1);
+        
+        $dividerField = new class($dividerName, $label, $group ?? $this->currentGroup, $section ?? $this->currentSection) extends Field {
+            protected string $dividerLabel;
+            protected ?string $dividerGroup;
+            protected ?string $dividerSection;
+            
+            public function __construct(string $name, ?string $label, ?string $group, ?string $section)
+            {
+                $this->name = $name;
+                $this->type = 'divider';
+                $this->dividerLabel = $label ?? '';
+                $this->dividerGroup = $group;
+                $this->dividerSection = $section;
+                
+                if ($group) $this->group = $group;
+                if ($section) $this->section = $section;
+            }
+            
+            protected function getFieldType(): string
+            {
+                return 'divider';
+            }
+            
+            public function render(): string
+            {
+                $label = $this->dividerLabel ? '<span>' . htmlspecialchars($this->dividerLabel) . '</span>' : '';
+                return '<hr class="form-divider">' . $label;
+            }
+            
+            public function getDividerLabel(): string
+            {
+                return $this->dividerLabel;
+            }
+        };
+        
+        $this->fields->put($dividerName, $dividerField);
+        
         return $this;
     }
 
@@ -438,6 +599,11 @@ class FormBuilder
                 'class' => $field->getClass(),
                 'id' => $field->getId(),
                 'step' => $field->getStep(),
+                'width' => $field->getWidth(),
+                'totalColumns' => $field->getTotalColumns(),
+                'row' => $field->getRow(),
+                'group' => $field->getGroup(),
+                'section' => $field->getSection(),
                 'conditional' => [
                     'show_if' => $field->getShowIf(),
                     'hide_if' => $field->getHideIf(),

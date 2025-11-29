@@ -254,6 +254,296 @@ $form->withoutCache();
 - API endpoints serving the same form to many users
 - Admin panels with heavy permission checks
 
+### Grid Layout & Column Width
+
+Control field widths for responsive grid layouts (works with Bootstrap, Tailwind, or any frontend):
+
+```php
+use Litepie\Form\Facades\Form;
+
+// Default: all fields are 6 columns (half width)
+$form = Form::create()
+    ->add(Form::text('first_name'))  // 6 columns (default)
+    ->add(Form::text('last_name'));  // 6 columns (default)
+
+// Custom column widths
+$form = Form::create()
+    ->add(Form::text('first_name')->col(6))   // 6/12 columns
+    ->add(Form::text('last_name')->col(6))    // 6/12 columns
+    ->add(Form::email('email')->col(12))      // Full width
+    ->add(Form::text('city')->col(4))         // 4/12 columns
+    ->add(Form::text('state')->col(4))        // 4/12 columns
+    ->add(Form::text('zip')->col(4));         // 4/12 columns
+
+// Group fields in rows (Recommended)
+$form = Form::create()
+    // Row 1: Two half-width fields (auto row ID: 'row1')
+    ->row([
+        Form::text('first_name')->col(6),
+        Form::text('last_name')->col(6)
+    ])
+    
+    // Row 2: Three equal fields (auto row ID: 'row2')
+    ->row([
+        Form::text('city')->col(4),
+        Form::text('state')->col(4),
+        Form::text('zip')->col(4)
+    ])
+    
+    // Row 3: Custom split (auto row ID: 'row3')
+    ->row([
+        Form::text('field1')->col(3),
+        Form::text('field2')->col(4),
+        Form::text('field3')->col(5)
+    ])
+    
+    // Row with custom ID
+    ->row([
+        Form::textarea('notes')->col(12)
+    ], 'notes-row');
+
+// Alternative: Manual row assignment
+$form = Form::create()
+    ->add(Form::text('first_name')->col(6)->row('contact'))
+    ->add(Form::text('last_name')->col(6)->row('contact'))
+    ->add(Form::text('city')->col(4)->row('address'))
+    ->add(Form::text('state')->col(4)->row('address'))
+    ->add(Form::text('zip')->col(4)->row('address'));
+
+// Change default width for all fields
+$form = Form::create()
+    ->defaultWidth(4)  // All fields 4 columns by default
+    ->row([
+        Form::text('field1'),      // 4 columns (uses default)
+        Form::text('field2'),      // 4 columns (uses default)
+        Form::text('field3')       // 4 columns (uses default)
+    ])
+    ->row([
+        Form::text('notes')->col(12)  // Override: full width
+    ]);
+
+// Output includes width and row for client-side rendering
+$data = $form->toArray();
+// Each field has: 'width' => 6, 'totalColumns' => 12, 'row' => 'row1'
+```
+
+**Frontend Implementation:**
+```javascript
+// Group fields by row
+const rows = {};
+Object.values(fields).forEach(field => {
+  const rowId = field.row || 'default';
+  if (!rows[rowId]) rows[rowId] = [];
+  rows[rowId].push(field);
+});
+
+// Render each row with Bootstrap
+Object.entries(rows).forEach(([rowId, rowFields]) => {
+  const html = `
+    <div class="row" data-row="${rowId}">
+      ${rowFields.map(field => `
+        <div class="col-md-${field.width}">
+          ${renderField(field)}
+        </div>
+      `).join('')}
+    </div>
+  `;
+});
+
+// Render each row with Tailwind
+Object.entries(rows).forEach(([rowId, rowFields]) => {
+  const html = `
+    <div class="grid grid-cols-12 gap-4" data-row="${rowId}">
+      ${rowFields.map(field => `
+        <div class="col-span-${field.width}">
+          ${renderField(field)}
+        </div>
+      `).join('')}
+    </div>
+  `;
+});
+```
+
+### Hierarchical Form Organization (Groups, Sections, Rows)
+
+Organize complex forms with a hierarchical structure: **Form → Groups → Sections → Rows → Fields**
+
+```php
+use Litepie\Form\Facades\Form;
+
+$form = Form::create()
+    ->action('/users')
+    
+    // Group 1: Basic Information
+    ->group('basic_info', 'Basic Information', 'Enter your basic details')
+        
+        // Section 1.1: Personal Details
+        ->section('personal', 'Personal Details')
+            ->row([
+                Form::text('first_name')->col(6)->label('First Name')->required(),
+                Form::text('last_name')->col(6)->label('Last Name')->required()
+            ])
+            ->row([
+                Form::email('email')->col(6)->label('Email'),
+                Form::tel('phone')->col(6)->label('Phone')
+            ])
+        ->endSection()
+        
+        // Section 1.2: Address
+        ->section('address', 'Address Information')
+            ->row([
+                Form::text('street')->col(12)->label('Street Address')
+            ])
+            ->row([
+                Form::text('city')->col(4)->label('City'),
+                Form::text('state')->col(4)->label('State'),
+                Form::text('zip')->col(4)->label('ZIP Code')
+            ])
+        ->endSection()
+        
+    ->endGroup()
+    
+    // Visual separator with label
+    ->divider('Additional Details')
+    
+    // Group 2: Account Settings
+    ->group('account_settings', 'Account Settings')
+        
+        ->section('security', 'Security')
+            ->row([
+                Form::password('password')->col(6)->label('Password'),
+                Form::password('password_confirmation')->col(6)->label('Confirm Password')
+            ])
+        ->endSection()
+        
+        ->section('preferences', 'Preferences')
+            ->row([
+                Form::checkbox('newsletter')->label('Subscribe to newsletter'),
+                Form::checkbox('notifications')->label('Enable notifications')
+            ])
+        ->endSection()
+        
+    ->endGroup()
+    
+    // Divider without label (just a line)
+    ->divider()
+    
+    // Fields without group/section (top-level)
+    ->row([
+        Form::submit('submit')->value('Save Changes')->class('btn btn-primary')
+    ]);
+```
+
+**Key Features:**
+
+- **Groups**: Top-level organization with titles and descriptions
+- **Sections**: Sub-groups within groups (can have multiple sections per group)
+- **Rows**: Layout containers for fields with column widths
+- **Dividers**: Visual separators with optional labels
+- **Auto-assignment**: Fields added after `group()` or `section()` automatically inherit the group/section
+- **Flexible nesting**: Mix grouped and ungrouped fields in the same form
+
+**Alternative Syntax (without fluent methods):**
+
+```php
+$form = Form::create()
+    ->group('info', 'Information')
+    
+    // Add fields - they automatically get group='info'
+    ->add(Form::text('name')->col(6)->section('personal'))
+    ->add(Form::email('email')->col(6)->section('personal'))
+    
+    ->add(Form::text('company')->col(6)->section('business'))
+    ->add(Form::text('title')->col(6)->section('business'))
+    
+    ->endGroup();
+```
+
+**Output Structure (toArray/toJson):**
+
+```json
+{
+  "fields": {
+    "first_name": {
+      "name": "first_name",
+      "type": "text",
+      "label": "First Name",
+      "width": 6,
+      "row": "row1",
+      "group": "basic_info",
+      "section": "personal"
+    },
+    "email": {
+      "name": "email",
+      "type": "email",
+      "width": 6,
+      "row": "row2",
+      "group": "basic_info",
+      "section": "personal"
+    }
+  }
+}
+```
+
+**Frontend Rendering:**
+
+```javascript
+// Group fields by hierarchy
+const structure = {};
+
+Object.values(fields).forEach(field => {
+  const groupId = field.group || 'default';
+  const sectionId = field.section || 'default';
+  const rowId = field.row || 'default';
+  
+  if (!structure[groupId]) {
+    structure[groupId] = { sections: {} };
+  }
+  if (!structure[groupId].sections[sectionId]) {
+    structure[groupId].sections[sectionId] = { rows: {} };
+  }
+  if (!structure[groupId].sections[sectionId].rows[rowId]) {
+    structure[groupId].sections[sectionId].rows[rowId] = [];
+  }
+  
+  structure[groupId].sections[sectionId].rows[rowId].push(field);
+});
+
+// Render with Bootstrap
+Object.entries(structure).forEach(([groupId, group]) => {
+  html += `<div class="form-group-container" data-group="${groupId}">`;
+  
+  Object.entries(group.sections).forEach(([sectionId, section]) => {
+    html += `<div class="form-section" data-section="${sectionId}">`;
+    
+    Object.entries(section.rows).forEach(([rowId, fields]) => {
+      html += `<div class="row" data-row="${rowId}">`;
+      fields.forEach(field => {
+        html += `<div class="col-md-${field.width}">${renderField(field)}</div>`;
+      });
+      html += `</div>`;
+    });
+    
+    html += `</div>`;
+  });
+  
+  html += `</div>`;
+});
+```
+
+**Divider Types:**
+
+```php
+// Divider with label
+->divider('Section Title')
+
+// Plain divider (just a line)
+->divider()
+
+// Divider in specific group/section
+->divider('Advanced Options', 'settings_group', 'advanced_section')
+```
+
 ## 📝 Field Types
     'required' => true
 ]);
