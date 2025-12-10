@@ -1542,7 +1542,192 @@
           "type": "textarea",
           "roles": ["admin", "moderator"]
         }
+      },
+      {
+        "condition": "visibleWhen",
+        "description": "Declarative visibility conditions with operators",
+        "examples": [
+          {
+            "name": "credit_card",
+            "type": "text",
+            "visibilityConditions": [
+              {"field": "payment_method", "operator": "=", "value": "card"}
+            ]
+          },
+          {
+            "name": "discount_code",
+            "type": "text",
+            "visibilityConditions": [
+              {"field": "membership", "operator": "=", "value": "premium"},
+              {"field": "total_amount", "operator": ">", "value": 100}
+            ]
+          },
+          {
+            "name": "preferred_color",
+            "type": "select",
+            "visibilityConditions": [
+              {"field": "interests", "operator": "in", "value": ["art", "design"]}
+            ]
+          }
+        ]
       }
     ]
+  },
+  "advancedFeatures": {
+    "description": "Examples of advanced field features",
+    "features": {
+      "conditionalRequired": {
+        "description": "Make fields required based on conditions",
+        "examples": [
+          {
+            "name": "billing_address",
+            "type": "text",
+            "requiredConditions": [
+              {"field": "same_as_shipping", "operator": "!=", "value": true}
+            ]
+          },
+          {
+            "name": "company_name",
+            "type": "text",
+            "requiredConditions": [
+              {"field": "account_type", "operator": "=", "value": "business"}
+            ]
+          }
+        ]
+      },
+      "fieldDependencies": {
+        "description": "Fields that depend on other field values",
+        "examples": [
+          {
+            "name": "city",
+            "type": "select",
+            "dependsOn": ["country", "state"],
+            "loadingText": "Loading cities..."
+          },
+          {
+            "name": "product_model",
+            "type": "select",
+            "dependsOn": ["brand"],
+            "loadingText": "Loading models for selected brand..."
+          }
+        ]
+      },
+      "computedFields": {
+        "description": "Fields with calculated values",
+        "examples": [
+          {
+            "name": "total_price",
+            "type": "text",
+            "isComputed": true,
+            "readonly": true,
+            "tooltip": "Automatically calculated from quantity × unit price"
+          },
+          {
+            "name": "full_name",
+            "type": "text",
+            "isComputed": true,
+            "readonly": true,
+            "dependsOn": ["first_name", "last_name"]
+          }
+        ]
+      },
+      "tooltipsAndExamples": {
+        "description": "Inline help and example values",
+        "examples": [
+          {
+            "name": "api_key",
+            "type": "text",
+            "tooltip": "Found in your account settings under API Access",
+            "example": "sk_live_4eC39HqLyjWDarjtT1zdp7dc"
+          },
+          {
+            "name": "webhook_url",
+            "type": "url",
+            "tooltip": "HTTPS endpoint that will receive event notifications",
+            "example": "https://example.com/webhooks/stripe"
+          }
+        ]
+      },
+      "customValidationMessages": {
+        "description": "Override default validation messages",
+        "examples": [
+          {
+            "name": "work_email",
+            "type": "email",
+            "validation": "required|email",
+            "validationMessages": {
+              "required": "Work email is mandatory",
+              "email": "Please enter a valid work email address"
+            }
+          }
+        ]
+      },
+      "confirmationDialogs": {
+        "description": "Require confirmation before changing value",
+        "examples": [
+          {
+            "name": "delete_account",
+            "type": "checkbox",
+            "confirmMessage": "Are you sure you want to delete your account? This cannot be undone."
+          },
+          {
+            "name": "cancel_subscription",
+            "type": "checkbox",
+            "confirmMessage": "Canceling will stop all future billing. Continue?"
+          }
+        ]
+      },
+      "changeTracking": {
+        "description": "Track changes to field values",
+        "examples": [
+          {
+            "name": "username",
+            "type": "text",
+            "trackChanges": true
+          },
+          {
+            "name": "account_status",
+            "type": "select",
+            "trackChanges": true
+          }
+        ]
+      },
+      "columnLayouts": {
+        "description": "Set field width in grid columns (out of 12)",
+        "examples": [
+          {
+            "name": "first_name",
+            "type": "text",
+            "columns": 6
+          },
+          {
+            "name": "last_name",
+            "type": "text",
+            "columns": 6
+          },
+          {
+            "name": "bio",
+            "type": "textarea",
+            "columns": 12
+          },
+          {
+            "name": "city",
+            "type": "text",
+            "columns": 4
+          },
+          {
+            "name": "state",
+            "type": "text",
+            "columns": 4
+          },
+          {
+            "name": "zip",
+            "type": "text",
+            "columns": 4
+          }
+        ]
+      }
+    }
   }
 }
+

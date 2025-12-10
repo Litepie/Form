@@ -65,12 +65,6 @@
         "psr-4": {
             "Litepie\\Form\\": "src/"
         },
-        "classmap": [
-            "src/Fields/BasicFields.php",
-            "src/Fields/ComplexFields.php",
-            "src/Fields/AdvancedFields.php",
-            "src/Fields/AdditionalFields.php"
-        ],
         "files": [
             "src/helpers.php"
         ]

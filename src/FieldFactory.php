@@ -33,12 +33,18 @@ class FieldFactory
         // Text areas and rich content
         'textarea' => Fields\TextareaField::class,
         'richtext' => Fields\RichTextField::class,
+        'markdown' => Fields\MarkdownField::class,
+        'code' => Fields\CodeField::class,
+        'json' => Fields\JsonField::class,
         
         // Selection fields
         'select' => Fields\SelectField::class,
         'radio' => Fields\RadioField::class,
         'checkbox' => Fields\CheckboxField::class,
+        'checkbox_group' => Fields\CheckboxGroupField::class,
         'tags' => Fields\TagsField::class,
+        'toggle' => Fields\ToggleField::class,
+        'autocomplete' => Fields\AutocompleteField::class,
         
         // File upload fields
         'file' => Fields\FileField::class,
@@ -49,16 +55,29 @@ class FieldFactory
         'date' => Fields\DateField::class,
         'time' => Fields\TimeField::class,
         'datetime' => Fields\DateTimeField::class,
-        'datetime-local' => Fields\DateTimeField::class,
+        'datetime-local' => Fields\DateTimeLocalField::class,
         'week' => Fields\WeekField::class,
         'month' => Fields\MonthField::class,
         'daterange' => Fields\DateRangeField::class,
+        
+        // Specialized numeric fields
+        'currency' => Fields\CurrencyField::class,
+        'percentage' => Fields\PercentageField::class,
         
         // Visual and interactive fields
         'color' => Fields\ColorField::class,
         'range' => Fields\RangeField::class,
         'rating' => Fields\RatingField::class,
         'map' => Fields\MapField::class,
+        'icon' => Fields\IconField::class,
+        
+        // Complex/Dynamic fields
+        'repeater' => Fields\RepeaterField::class,
+        'keyvalue' => Fields\KeyValueField::class,
+        
+        // Layout fields
+        'divider' => Fields\DividerField::class,
+        'html' => Fields\HtmlField::class,
         
         // Form control fields
         'submit' => Fields\SubmitField::class,

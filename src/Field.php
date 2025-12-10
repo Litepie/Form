@@ -87,6 +87,11 @@ abstract class Field
     protected ?\Closure $visibilityCondition = null;
 
     /**
+     * Declarative visibility conditions (field, operator, value).
+     */
+    protected array $visibilityConditions = [];
+
+    /**
      * Permission/ability required to view this field.
      */
     protected ?string $permission = null;
@@ -125,6 +130,56 @@ abstract class Field
      * Section identifier (sub-group within a group).
      */
     protected ?string $section = null;
+
+    /**
+     * Tooltip text.
+     */
+    protected ?string $tooltip = null;
+
+    /**
+     * Example value or hint.
+     */
+    protected ?string $example = null;
+
+    /**
+     * Field this field depends on.
+     */
+    protected ?string $dependsOn = null;
+
+    /**
+     * Computed field callback.
+     */
+    protected ?\Closure $computedCallback = null;
+
+    /**
+     * Conditional required rules.
+     */
+    protected array $requiredConditions = [];
+
+    /**
+     * Custom validation messages.
+     */
+    protected array $validationMessages = [];
+
+    /**
+     * Loading text for async operations.
+     */
+    protected ?string $loadingText = null;
+
+    /**
+     * Confirmation message for changes.
+     */
+    protected ?string $confirmMessage = null;
+
+    /**
+     * Whether to track changes.
+     */
+    protected bool $trackChanges = false;
+
+    /**
+     * Number of columns for layout.
+     */
+    protected ?int $columns = null;
 
     /**
      * Create a new field instance.
@@ -344,6 +399,201 @@ abstract class Field
     }
 
     /**
+     * Set or get tooltip text.
+     */
+    public function tooltip(?string $tooltip = null): self|string|null
+    {
+        if ($tooltip === null) {
+            return $this->tooltip;
+        }
+        
+        $this->tooltip = $tooltip;
+        return $this;
+    }
+
+    /**
+     * Get tooltip text.
+     */
+    public function getTooltip(): ?string
+    {
+        return $this->tooltip;
+    }
+
+    /**
+     * Set or get example value.
+     */
+    public function example(?string $example = null): self|string|null
+    {
+        if ($example === null) {
+            return $this->example;
+        }
+        
+        $this->example = $example;
+        return $this;
+    }
+
+    /**
+     * Get example value.
+     */
+    public function getExample(): ?string
+    {
+        return $this->example;
+    }
+
+    /**
+     * Set field dependency.
+     */
+    public function dependsOn(string $fieldName): self
+    {
+        $this->dependsOn = $fieldName;
+        return $this;
+    }
+
+    /**
+     * Get field dependency.
+     */
+    public function getDependsOn(): ?string
+    {
+        return $this->dependsOn;
+    }
+
+    /**
+     * Set computed field callback.
+     */
+    public function computed(\Closure $callback): self
+    {
+        $this->computedCallback = $callback;
+        return $this;
+    }
+
+    /**
+     * Check if field is computed.
+     */
+    public function isComputed(): bool
+    {
+        return $this->computedCallback !== null;
+    }
+
+    /**
+     * Compute field value.
+     */
+    public function computeValue(array $data): mixed
+    {
+        if ($this->computedCallback) {
+            return call_user_func($this->computedCallback, $data);
+        }
+        
+        return $this->value;
+    }
+
+    /**
+     * Set conditional required rule.
+     */
+    public function requiredWhen(string $field, string $operator, mixed $value): self
+    {
+        $this->requiredConditions[] = [
+            'field' => $field,
+            'operator' => $operator,
+            'value' => $value,
+        ];
+        
+        return $this;
+    }
+
+    /**
+     * Get required conditions.
+     */
+    public function getRequiredConditions(): array
+    {
+        return $this->requiredConditions;
+    }
+
+    /**
+     * Set custom validation message.
+     */
+    public function validationMessage(string $rule, string $message): self
+    {
+        $this->validationMessages[$rule] = $message;
+        return $this;
+    }
+
+    /**
+     * Get validation messages.
+     */
+    public function getValidationMessages(): array
+    {
+        return $this->validationMessages;
+    }
+
+    /**
+     * Set loading text.
+     */
+    public function loadingText(string $text): self
+    {
+        $this->loadingText = $text;
+        return $this;
+    }
+
+    /**
+     * Get loading text.
+     */
+    public function getLoadingText(): ?string
+    {
+        return $this->loadingText;
+    }
+
+    /**
+     * Set confirmation message.
+     */
+    public function confirmChange(string $message): self
+    {
+        $this->confirmMessage = $message;
+        return $this;
+    }
+
+    /**
+     * Get confirmation message.
+     */
+    public function getConfirmMessage(): ?string
+    {
+        return $this->confirmMessage;
+    }
+
+    /**
+     * Enable change tracking.
+     */
+    public function trackChanges(bool $track = true): self
+    {
+        $this->trackChanges = $track;
+        return $this;
+    }
+
+    /**
+     * Check if changes are tracked.
+     */
+    public function isTrackingChanges(): bool
+    {
+        return $this->trackChanges;
+    }
+
+    /**
+     * Set number of columns for layout.
+     */
+    public function columns(int|array $columns): self
+    {
+        $this->columns = is_array($columns) ? $columns : $columns;
+        return $this;
+    }
+
+    /**
+     * Get columns.
+     */
+    public function getColumns(): ?int
+    {
+        return $this->columns;
+    }
+
+    /**
      * Set errors.
      */
     public function errors(array $errors): self
@@ -380,12 +630,117 @@ abstract class Field
     }
 
     /**
-     * Set visibility condition (callback).
+     * Set visibility condition (callback or declarative).
+     * 
+     * Usage:
+     *   ->visibleWhen(fn($data) => $data['type'] === 'premium')
+     *   ->visibleWhen('type', '=', 'premium')
+     *   ->visibleWhen('age', '>', 18)
      */
-    public function visibleWhen(\Closure $callback): self
+    public function visibleWhen(...$args): self
     {
-        $this->visibilityCondition = $callback;
+        if (count($args) === 1 && $args[0] instanceof \Closure) {
+            // Closure-based condition
+            $this->visibilityCondition = $args[0];
+        } elseif (count($args) === 3) {
+            // Declarative condition: field, operator, value
+            [$field, $operator, $value] = $args;
+            $this->visibilityConditions[] = [
+                'field' => $field,
+                'operator' => $operator,
+                'value' => $value,
+            ];
+        }
         return $this;
+    }
+
+    /**
+     * Get visibility conditions.
+     */
+    public function getVisibilityConditions(): array
+    {
+        return $this->visibilityConditions;
+    }
+
+    /**
+     * Check if field meets visibility conditions.
+     */
+    public function meetsVisibilityConditions(array $data): bool
+    {
+        // Check closure-based condition
+        if ($this->visibilityCondition !== null) {
+            return call_user_func($this->visibilityCondition, $data);
+        }
+
+        // Check declarative conditions (all must be true)
+        if (empty($this->visibilityConditions)) {
+            return true;
+        }
+
+        foreach ($this->visibilityConditions as $condition) {
+            // Support dot notation for nested data
+            $fieldValue = $data[$condition['field']] ?? null;
+            if (str_contains($condition['field'], '.')) {
+                // Handle nested fields like 'address.city'
+                $keys = explode('.', $condition['field']);
+                $fieldValue = $data;
+                foreach ($keys as $key) {
+                    if (is_array($fieldValue) && isset($fieldValue[$key])) {
+                        $fieldValue = $fieldValue[$key];
+                    } else {
+                        $fieldValue = null;
+                        break;
+                    }
+                }
+            }
+            
+            switch ($condition['operator']) {
+                case '=':
+                case '==':
+                    if ($fieldValue != $condition['value']) return false;
+                    break;
+                case '===':
+                    if ($fieldValue !== $condition['value']) return false;
+                    break;
+                case '!=':
+                    if ($fieldValue == $condition['value']) return false;
+                    break;
+                case '!==':
+                    if ($fieldValue === $condition['value']) return false;
+                    break;
+                case '>':
+                    if ($fieldValue <= $condition['value']) return false;
+                    break;
+                case '>=':
+                    if ($fieldValue < $condition['value']) return false;
+                    break;
+                case '<':
+                    if ($fieldValue >= $condition['value']) return false;
+                    break;
+                case '<=':
+                    if ($fieldValue > $condition['value']) return false;
+                    break;
+                case 'in':
+                    if (!in_array($fieldValue, (array)$condition['value'])) return false;
+                    break;
+                case 'not_in':
+                    if (in_array($fieldValue, (array)$condition['value'])) return false;
+                    break;
+                case 'contains':
+                    if (strpos($fieldValue, $condition['value']) === false) return false;
+                    break;
+                case 'starts_with':
+                    if (!str_starts_with($fieldValue, $condition['value'])) return false;
+                    break;
+                case 'ends_with':
+                    if (!str_ends_with($fieldValue, $condition['value'])) return false;
+                    break;
+                default:
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -866,8 +1221,19 @@ abstract class Field
             'attributes' => $this->attributes,
             'required' => $this->required,
             'help' => $this->help,
+            'tooltip' => $this->tooltip,
+            'example' => $this->example,
             'errors' => $this->errors,
             'id' => $this->getId(),
+            'dependsOn' => $this->dependsOn,
+            'isComputed' => $this->isComputed(),
+            'requiredConditions' => $this->requiredConditions,
+            'validationMessages' => $this->validationMessages,
+            'loadingText' => $this->loadingText,
+            'confirmMessage' => $this->confirmMessage,
+            'trackChanges' => $this->trackChanges,
+            'columns' => $this->columns,
+            'visibilityConditions' => $this->visibilityConditions,
         ];
     }
 
