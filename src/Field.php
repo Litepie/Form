@@ -182,6 +182,20 @@ abstract class Field
     protected ?int $columns = null;
 
     /**
+     * Create a field instance using the factory.
+     * 
+     * @param string $type Field type (text, email, select, etc.)
+     * @param string $name Field name
+     * @param array $options Additional field options
+     * @return static
+     */
+    public static function make(string $type, string $name, array $options = []): Field
+    {
+        $factory = \Illuminate\Container\Container::getInstance()->make(FieldFactory::class);
+        return $factory->create($name, $type, $options);
+    }
+
+    /**
      * Create a new field instance.
      */
     public function __construct(string $name, array $options = [])

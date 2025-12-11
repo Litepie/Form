@@ -83,35 +83,82 @@ Include the CSS and JavaScript assets in your layout:
 
 ## 🚀 Quick Start
 
-### Basic Contact Form
+### Creating Fields
+
+The package provides multiple ways to create fields:
+
+#### Method 1: Using Field::make() (Recommended)
+
+```php
+use Litepie\Form\Field;
+
+// Simple field
+$field = Field::make('text', 'username');
+
+// With fluent API
+$field = Field::make('select', 'theme')
+    ->label('Select Theme')
+    ->options(['dark' => 'Dark Mode', 'light' => 'Light Mode'])
+    ->required();
+
+// With options array
+$field = Field::make('email', 'contact', [
+    'label' => 'Email Address',
+    'required' => true,
+    'placeholder' => 'you@example.com'
+]);
+```
+
+#### Method 2: Using Form Builder add() method
 
 ```php
 use Litepie\Form\Facades\Form;
 
+$form = Form::create()
+    ->add('name', 'text', ['label' => 'Name', 'required' => true])
+    ->add('email', 'email', ['label' => 'Email']);
+```
+
+#### Method 3: Using Specific Field Classes
+
+```php
+use Litepie\Form\Fields\TextField;
+use Litepie\Form\Fields\SelectField;
+
+$textField = new TextField('username');
+$selectField = new SelectField('country');
+```
+
+### Basic Contact Form
+
+```php
+use Litepie\Form\Facades\Form;
+use Litepie\Form\Field;
+
 $contactForm = Form::create()
     ->action('/contact')
     ->method('POST')
-    ->add('name', 'text', [
-        'label' => 'Full Name',
-        'required' => true,
-        'placeholder' => 'Enter your full name',
-        'validation' => 'required|string|max:255'
-    ])
-    ->add('email', 'email', [
-        'label' => 'Email Address',
-        'required' => true,
-        'validation' => 'required|email'
-    ])
-    ->add('message', 'textarea', [
-        'label' => 'Message',
-        'required' => true,
-        'rows' => 5,
-        'validation' => 'required|string|min:10'
-    ])
-    ->add('submit', 'submit', [
-        'value' => 'Send Message',
-        'class' => 'btn btn-primary'
-    ]);
+    ->add(Field::make('text', 'name')
+        ->label('Full Name')
+        ->required()
+        ->placeholder('Enter your full name')
+        ->rules('required|string|max:255')
+    )
+    ->add(Field::make('email', 'email')
+        ->label('Email Address')
+        ->required()
+        ->rules('required|email')
+    )
+    ->add(Field::make('textarea', 'message')
+        ->label('Message')
+        ->required()
+        ->setAttribute('rows', 5)
+        ->rules('required|string|min:10')
+    )
+    ->add(Field::make('submit', 'submit')
+        ->value('Send Message')
+        ->addClass('btn btn-primary')
+    );
 
 // In your Blade template
 {!! $contactForm->render() !!}
@@ -124,20 +171,20 @@ $registrationForm = Form::create()
     ->action('/register')
     ->method('POST')
     ->files(true)
-    ->add('avatar', 'image', [
-        'label' => 'Profile Picture',
-        'accept' => 'image/*',
-        'maxSize' => 5, // 5MB
-        'crop' => true,
-        'aspectRatio' => '1:1'
-    ])
-    ->add('first_name', 'text', [
-        'label' => 'First Name',
-        'required' => true
-    ])
-    ->add('last_name', 'text', [
-        'label' => 'Last Name',
-        'required' => true
+    ->add(Field::make('image', 'avatar')
+        ->label('Profile Picture')
+        ->setAttribute('accept', 'image/*')
+        ->setAttribute('maxSize', 5) // 5MB
+        ->setAttribute('crop', true)
+        ->setAttribute('aspectRatio', '1:1')
+    )
+    ->add(Field::make('text', 'first_name')
+        ->label('First Name')
+        ->required()
+    )
+    ->add(Field::make('text', 'last_name')
+        ->label('Last Name')
+        ->required()
     ])
     ->add('email', 'email', [
         'label' => 'Email',

@@ -2,6 +2,53 @@
 
 This guide demonstrates the advanced features available in the Litepie Form Builder package.
 
+## Field Creation Methods
+
+The package supports multiple ways to create fields:
+
+### Using Field::make() (Recommended)
+
+```php
+use Litepie\Form\Field;
+
+// Simple field creation
+$field = Field::make('text', 'username');
+
+// With options
+$field = Field::make('select', 'theme', [
+    'label' => 'Theme',
+    'options' => ['dark' => 'Dark', 'light' => 'Light']
+]);
+
+// Chainable methods
+$field = Field::make('email', 'contact_email')
+    ->label('Contact Email')
+    ->required()
+    ->placeholder('you@example.com');
+```
+
+### Using Specific Field Classes
+
+```php
+use Litepie\Form\Fields\TextField;
+use Litepie\Form\Fields\SelectField;
+
+$textField = new TextField('username');
+$selectField = new SelectField('theme');
+```
+
+### Using Form Builder
+
+```php
+use Litepie\Form\Facades\Form;
+
+$form = Form::create()
+    ->add(Field::make('text', 'name'))
+    ->add(Field::make('email', 'email'));
+```
+
+---
+
 ## 1. Conditional Visibility with Operators
 
 Show or hide fields based on the values of other fields using declarative conditions.
@@ -10,12 +57,13 @@ Show or hide fields based on the values of other fields using declarative condit
 
 ```php
 use Litepie\Form\Facades\Form;
+use Litepie\Form\Field;
 
 $form = Form::create()
     ->action('/checkout')
     ->method('POST')
     ->add(
-        Field::select('payment_method')
+        Field::make('select', 'payment_method')
             ->label('Payment Method')
             ->options([
                 'card' => 'Credit Card',
@@ -24,7 +72,7 @@ $form = Form::create()
             ])
     )
     ->add(
-        Field::text('credit_card')
+        Field::make('text', 'credit_card')
             ->label('Credit Card Number')
             ->visibleWhen('payment_method', '=', 'card') // Only show when card is selected
     )
