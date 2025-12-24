@@ -16,7 +16,7 @@ class RangeField extends Field
     protected bool $showLabels = false;
     protected bool $showTicks = false;
     protected ?int $tickInterval = null;
-    protected bool $tooltip = true;
+    protected ?string $tooltip = null;
     protected bool $dual = false;
     protected bool $vertical = false;
     protected ?string $color = null;

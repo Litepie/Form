@@ -8,7 +8,7 @@ namespace Litepie\Form\Fields;
 class ButtonField extends TextField
 {
     protected string $variant = 'primary';
-    protected string $size = 'md';
+    protected ?string $size = 'md';
     protected ?string $icon = null;
     protected string $iconPosition = 'left';
     protected bool $loading = false;

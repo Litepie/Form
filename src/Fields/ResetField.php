@@ -8,7 +8,7 @@ namespace Litepie\Form\Fields;
 class ResetField extends TextField
 {
     protected string $variant = 'secondary';
-    protected string $size = 'md';
+    protected ?string $size = 'md';
     protected ?string $icon = null;
     protected ?string $confirmText = null;
 

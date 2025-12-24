@@ -1,17 +1,16 @@
 <?php
-
 namespace Litepie\Form;
 
 use Illuminate\Support\Str;
-use Litepie\Form\Concerns\HasVisibility;
-use Litepie\Form\Concerns\HasValidation;
-use Litepie\Form\Concerns\HasLayout;
 use Litepie\Form\Concerns\HasAttributes;
 use Litepie\Form\Concerns\HasDependencies;
+use Litepie\Form\Concerns\HasLayout;
+use Litepie\Form\Concerns\HasValidation;
+use Litepie\Form\Concerns\HasVisibility;
 
 /**
  * Base Field Class
- * 
+ *
  * Abstract base class for all form fields.
  * Uses traits to organize functionality into cohesive concerns.
  */
@@ -55,7 +54,7 @@ abstract class Field
 
     /**
      * Create a field instance using the factory.
-     * 
+     *
      * @param string $type Field type (text, email, select, etc.)
      * @param string $name Field name
      * @param array $options Additional field options
@@ -74,7 +73,7 @@ abstract class Field
     {
         $this->name = $name;
         $this->type = $this->getFieldType();
-        
+
         $this->setOptions($options);
     }
 
@@ -82,8 +81,6 @@ abstract class Field
      * Get the field type.
      */
     abstract protected function getFieldType(): string;
-
-
 
     /**
      * Set field options.
@@ -121,12 +118,12 @@ abstract class Field
     /**
      * Get or set field label.
      */
-    public function label(?string $label = null): string|self
+    public function label(?string $label = null): string | self
     {
         if ($label === null) {
             return $this->label ?: Str::title(str_replace('_', ' ', $this->name));
         }
-        
+
         $this->label = $label;
         return $this;
     }
@@ -142,12 +139,12 @@ abstract class Field
     /**
      * Get or set field placeholder.
      */
-    public function placeholder(?string $placeholder = null): self|string|null
+    public function placeholder(?string $placeholder = null): self | string | null
     {
         if ($placeholder === null) {
             return $this->placeholder;
         }
-        
+
         $this->placeholder = $placeholder;
         return $this;
     }
@@ -163,12 +160,12 @@ abstract class Field
     /**
      * Get or set options.
      */
-    public function options(?array $options = null): array|self
+    public function options(?array $options = null): array | self
     {
         if ($options === null) {
             return $this->options;
         }
-        
+
         $this->options = $options;
         return $this;
     }
@@ -206,57 +203,45 @@ abstract class Field
     }
 
     /**
-     * Render the field (must be implemented by subclasses).
-     */
-    abstract public function render(): string;
-
-    /**
      * Convert field to array.
      */
     public function toArray(): array
     {
         return [
-            'name' => $this->name,
-            'type' => $this->type,
-            'value' => $this->value,
-            'label' => $this->getLabel(),
-            'placeholder' => $this->placeholder,
-            'attributes' => $this->attributes,
-            'options' => $this->options,
-            'required' => $this->required,
-            'validation' => $this->validation,
-            'help' => $this->help,
-            'tooltip' => $this->tooltip,
-            'example' => $this->example,
-            'errors' => $this->errors,
-            'visible' => $this->visible,
-            'readonly' => $this->readonly,
-            'disabled' => $this->disabled,
-            'id' => $this->getId(),
-            'dependsOn' => $this->dependsOn,
-            'isComputed' => $this->isComputed(),
-            'requiredConditions' => $this->requiredConditions,
-            'validationMessages' => $this->validationMessages,
-            'loadingText' => $this->loadingText,
-            'confirmMessage' => $this->confirmMessage,
-            'trackChanges' => $this->trackChanges,
-            'permission' => $this->permission,
-            'roles' => $this->roles,
-            'width' => $this->width,
-            'totalColumns' => $this->totalColumns,
-            'row' => $this->row,
-            'group' => $this->group,
-            'section' => $this->section,
-            'columns' => $this->columns,
+            'name'                 => $this->name,
+            'type'                 => $this->type,
+            'value'                => $this->value,
+            'label'                => $this->getLabel(),
+            'placeholder'          => $this->placeholder,
+            'attributes'           => $this->attributes,
+            'options'              => $this->options,
+            'required'             => $this->required,
+            'validation'           => $this->validation,
+            'help'                 => $this->help,
+            'tooltip'              => $this->tooltip,
+            'example'              => $this->example,
+            'errors'               => $this->errors,
+            'visible'              => $this->visible,
+            'readonly'             => $this->readonly,
+            'disabled'             => $this->disabled,
+            'id'                   => $this->getId(),
+            'dependsOn'            => $this->dependsOn,
+            'isComputed'           => $this->isComputed(),
+            'requiredConditions'   => $this->requiredConditions,
+            'validationMessages'   => $this->validationMessages,
+            'loadingText'          => $this->loadingText,
+            'confirmMessage'       => $this->confirmMessage,
+            'trackChanges'         => $this->trackChanges,
+            'permission'           => $this->permission,
+            'roles'                => $this->roles,
+            'width'                => $this->width,
+            'totalColumns'         => $this->totalColumns,
+            'row'                  => $this->row,
+            'group'                => $this->group,
+            'section'              => $this->section,
+            'columns'              => $this->columns,
             'visibilityConditions' => $this->visibilityConditions,
         ];
     }
 
-    /**
-     * Convert to string.
-     */
-    public function __toString(): string
-    {
-        return $this->render();
-    }
 }

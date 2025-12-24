@@ -8,8 +8,8 @@ namespace Litepie\Form\Fields;
 class SearchField extends TextField
 {
     protected ?string $searchUrl = null;
-    protected int $minLength = 1;
-    protected int $debounce = 300;
+    protected ?int $minLength = null;
+    protected ?int $debounce = 300;
     protected bool $showResults = true;
     protected int $maxResults = 10;
     protected bool $liveSearch = false;

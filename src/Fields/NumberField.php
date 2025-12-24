@@ -17,6 +17,7 @@ class NumberField extends TextField
     protected string $decimalSeparator = '.';
     protected ?string $suffix = null;
     protected ?string $prefix = null;
+    protected array $attributes = [];
 
     protected function getFieldType(): string
     {
@@ -71,6 +72,23 @@ class NumberField extends TextField
         return $this;
     }
 
+    /**
+     * Set an attribute for the field.
+     */
+    public function setAttribute(string $key, mixed $value): self
+    {
+        $this->attributes[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * Get all attributes.
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [
@@ -84,6 +102,7 @@ class NumberField extends TextField
             'decimalSeparator' => $this->decimalSeparator,
             'suffix' => $this->suffix,
             'prefix' => $this->prefix,
+            'attributes' => $this->attributes,
         ]);
     }
 }

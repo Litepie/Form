@@ -10,7 +10,7 @@ namespace Litepie\Form\Fields;
 class AutocompleteField extends TextField
 {
     protected bool $allowCustom = true;
-    protected int $minLength = 1;
+    protected null|int $minLength = 1;
     protected int $maxSuggestions = 10;
     protected string $source = ''; // URL or local data
     
