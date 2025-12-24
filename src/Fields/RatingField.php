@@ -22,7 +22,7 @@ class RatingField extends Field
 
     protected function getFieldType(): string
     {
-        return 'number';
+        return 'rating';
     }
 
     public function icon(string $icon): self

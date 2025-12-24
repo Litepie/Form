@@ -46,7 +46,7 @@ class TagsField extends Field
 
     protected function getFieldType(): string
     {
-        return 'text';
+        return 'tags';
     }
 
     /**
