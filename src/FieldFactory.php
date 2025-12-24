@@ -49,6 +49,7 @@ class FieldFactory
         // File upload fields
         'file' => Fields\FileField::class,
         'image' => Fields\ImageField::class,
+        'avatar' => Fields\AvatarField::class,
         'gallery' => Fields\GalleryField::class,
         
         // Date and time fields

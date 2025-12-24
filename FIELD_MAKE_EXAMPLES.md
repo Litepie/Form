@@ -64,6 +64,16 @@ $bio = Field::make('textarea', 'bio')
     ->setAttribute('maxlength', 500);
 ```
 
+### Avatar Upload
+```php
+$avatar = Field::make('avatar', 'profile_picture')
+    ->label('Profile Picture')
+    ->size(150)
+    ->circle()
+    ->initialsFrom('name')
+    ->defaultAvatar('/images/default-avatar.png');
+```
+
 ## Advanced Field Types
 
 ### Currency Field
@@ -264,7 +274,7 @@ You can use any of these field types with `Field::make()`:
 - `currency`, `percentage`
 
 ### File/Media
-- `file`, `image`, `gallery`
+- `file`, `image`, `avatar`, `gallery`
 
 ### Visual/Interactive
 - `color`, `range`, `rating`, `map`, `icon`

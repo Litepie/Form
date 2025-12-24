@@ -1,6 +1,6 @@
 # Field Types Summary
 
-## Total Field Types: 44
+## Total Field Types: 45
 
 The Litepie Form Builder package now includes **44 individual field types**, making it one of the most comprehensive form builders available for Laravel.
 
@@ -47,11 +47,16 @@ The Litepie Form Builder package now includes **44 individual field types**, mak
 28. **CurrencyField** ✨ NEW - Money with currency symbol
 29. **PercentageField** ✨ NEW - Percentage (0-100)
 
-### 📁 File/Media Fields (3)
+### 📁 File/Media Fields (4)
 30. **FileField** - File upload
 31. **ImageField** - Image upload with crop
-32. **GalleryField** - Multiple images
+32. **AvatarField** ✨ NEW - Avatar/profile picture upload
+33. **GalleryField** - Multiple images
 
+### 🎨 Visual/Interactive Fields (5)
+33. **ColorField** - Color picker
+34. **RangeField** - Slider
+35. **RatingField** - Star rating
 ### 🎨 Visual/Interactive Fields (5)
 33. **ColorField** - Color picker
 34. **RangeField** - Slider
@@ -71,10 +76,11 @@ The Litepie Form Builder package now includes **44 individual field types**, mak
 42. **SubmitField** - Submit button
 43. **ButtonField** - Generic button
 44. **ResetField** - Reset button
+45. **AvatarField** ✨ NEW - Avatar/profile picture upload
 
 ---
 
-## ✨ Newly Added Field Types (14)
+## ✨ Newly Added Field Types (15)
 
 1. **ToggleField** - Visual on/off switch
 2. **CodeField** - Code editor with syntax highlighting (JavaScript, PHP, Python, etc.)
@@ -87,6 +93,10 @@ The Litepie Form Builder package now includes **44 individual field types**, mak
 9. **JsonField** - JSON editor with validation and formatting
 10. **RepeaterField** - Dynamic repeating field groups
 11. **KeyValueField** - Key-value pair editor
+12. **IconField** - Icon picker (FontAwesome, Bootstrap Icons, Heroicons)
+13. **DividerField** - Visual separator with optional text
+14. **HtmlField** - Display-only HTML content
+15. **AvatarField** - Avatar/profile picture upload with cropping
 12. **IconField** - Icon picker (FontAwesome, Bootstrap Icons, Heroicons)
 13. **DividerField** - Visual separator with optional text
 14. **HtmlField** - Display-only HTML content
@@ -229,15 +239,33 @@ Field::html()
     ->escapeHtml(false);
 ```
 
+### AvatarField
+```php
+Field::avatar('profile_picture')
+    ->label('Profile Picture')
+    ->size(150)
+    ->circle()
+    ->initialsFrom('name')
+    ->defaultAvatar('/images/default-avatar.png')
+    ->maxSize(2);
+
+// Or square avatar
+Field::avatar('company_logo')
+    ->label('Company Logo')
+    ->size(200)
+    ->square();
+```
+
 ---
 
 ## Comparison with Other Form Builders
 
 | Feature | Litepie Form | Filament | Laravel Nova | FormKit |
 |---------|--------------|----------|--------------|---------|
-| Total Field Types | **44** | ~35 | ~30 | ~25 |
+| Total Field Types | **45** | ~35 | ~30 | ~25 |
 | Code Editor | ✅ | ✅ | ❌ | ✅ |
 | Markdown Editor | ✅ | ✅ | ❌ | ✅ |
+| Avatar Field | ✅ | ✅ | ❌ | ❌ |
 | JSON Editor | ✅ | ✅ | ✅ | ❌ |
 | Currency Field | ✅ | ✅ | ❌ | ✅ |
 | Repeater Field | ✅ | ✅ | ✅ | ✅ |
