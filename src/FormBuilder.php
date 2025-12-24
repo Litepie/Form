@@ -393,52 +393,7 @@ class FormBuilder
         return $this;
     }
 
-    /**
-     * Add a divider with optional label.
-     */
-    public function divider(?string $label = null, ?string $group = null, ?string $section = null): self
-    {
-        // Create a pseudo-field for the divider
-        $dividerName = 'divider_' . (count($this->fields) + 1);
-        
-        $dividerField = new class($dividerName, $label, $group ?? $this->currentGroup, $section ?? $this->currentSection) extends Field {
-            protected string $dividerLabel;
-            protected ?string $dividerGroup;
-            protected ?string $dividerSection;
-            
-            public function __construct(string $name, ?string $label, ?string $group, ?string $section)
-            {
-                $this->name = $name;
-                $this->type = 'divider';
-                $this->dividerLabel = $label ?? '';
-                $this->dividerGroup = $group;
-                $this->dividerSection = $section;
-                
-                if ($group) $this->group = $group;
-                if ($section) $this->section = $section;
-            }
-            
-            protected function getFieldType(): string
-            {
-                return 'divider';
-            }
-            
-            public function render(): string
-            {
-                $label = $this->dividerLabel ? '<span>' . htmlspecialchars($this->dividerLabel) . '</span>' : '';
-                return '<hr class="form-divider">' . $label;
-            }
-            
-            public function getDividerLabel(): string
-            {
-                return $this->dividerLabel;
-            }
-        };
-        
-        $this->fields->put($dividerName, $dividerField);
-        
-        return $this;
-    }
+
 
     /**
      * Get a field by name.
@@ -672,14 +627,6 @@ class FormBuilder
                     'height' => $field->getHeight(),
                 ];
                 break;
-
-            case 'map':
-                $meta['map'] = [
-                    'zoom' => $field->getZoom(),
-                    'center' => $field->getCenter(),
-                    'markers' => $field->getMarkers(),
-                ];
-                break;
         }
 
         return $meta;
@@ -703,7 +650,7 @@ class FormBuilder
     protected function hasFileUploads(): bool
     {
         return $this->fields->contains(function ($field) {
-            return in_array($field->getType(), ['file', 'image', 'gallery']);
+            return in_array($field->getType(), ['file', 'image']);
         });
     }
 

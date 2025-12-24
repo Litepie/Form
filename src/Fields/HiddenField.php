@@ -12,13 +12,8 @@ class HiddenField extends TextField
         return 'hidden';
     }
 
-    public function render(): string
+    public function toArray(): array
     {
-        return sprintf(
-            '<input type="hidden" name="%s" id="%s" value="%s">',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? '')
-        );
+        return parent::toArray();
     }
 }

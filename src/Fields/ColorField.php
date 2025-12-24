@@ -9,21 +9,63 @@ use Litepie\Form\Field;
  */
 class ColorField extends Field
 {
+    protected string $format = 'hex';
+    protected bool $showAlpha = false;
+    protected bool $showInput = true;
+    protected array $presets = [];
+    protected array $swatches = [];
+    protected bool $inline = false;
+
     protected function getFieldType(): string
     {
         return 'color';
     }
 
-    public function render(): string
+    public function format(string $format): self
     {
-        $attributes = $this->buildAttributes();
-        
-        return sprintf(
-            '<input type="color" name="%s" id="%s" value="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? '#000000'),
-            $attributes
-        );
+        $this->format = $format;
+        return $this;
+    }
+
+    public function showAlpha(bool $show = true): self
+    {
+        $this->showAlpha = $show;
+        return $this;
+    }
+
+    public function showInput(bool $show = true): self
+    {
+        $this->showInput = $show;
+        return $this;
+    }
+
+    public function presets(array $presets): self
+    {
+        $this->presets = $presets;
+        return $this;
+    }
+
+    public function swatches(array $swatches): self
+    {
+        $this->swatches = $swatches;
+        return $this;
+    }
+
+    public function inline(bool $inline = true): self
+    {
+        $this->inline = $inline;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'format' => $this->format,
+            'showAlpha' => $this->showAlpha,
+            'showInput' => $this->showInput,
+            'presets' => $this->presets,
+            'swatches' => $this->swatches,
+            'inline' => $this->inline,
+        ]);
     }
 }

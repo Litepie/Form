@@ -2,34 +2,63 @@
 
 namespace Litepie\Form\Fields;
 
+use Litepie\Form\Field;
+
 /**
- * DateTime Local Field
- * 
- * HTML5 datetime-local input type
+ * DateTime Local Field (HTML5)
  */
-class DateTimeLocalField extends TextField
+class DateTimeLocalField extends Field
 {
     /**
-     * Get the field type.
+     * DateTime format.
      */
+    protected string $format = 'Y-m-d\TH:i';
+
+    /**
+     * Minimum datetime.
+     */
+    protected ?string $min = null;
+
+    /**
+     * Maximum datetime.
+     */
+    protected ?string $max = null;
+
+    /**
+     * Step in seconds.
+     */
+    protected ?int $step = null;
+
+    /**
+     * Show clear button.
+     */
+    protected bool $clearable = false;
+
     protected function getFieldType(): string
     {
         return 'datetime-local';
     }
 
     /**
-     * Render the field.
+     * Set step.
      */
-    public function render(): string
+    public function step(int $step): self
     {
-        $attributes = $this->buildAttributes();
-        
-        return sprintf(
-            '<input type="datetime-local" name="%s" id="%s" value="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? ''),
-            $attributes
-        );
+        $this->step = $step;
+        return $this;
+    }
+
+    /**
+     * Convert to array.
+     */
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'format' => $this->format,
+            'min' => $this->min,
+            'max' => $this->max,
+            'step' => $this->step,
+            'clearable' => $this->clearable,
+        ]);
     }
 }

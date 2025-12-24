@@ -114,35 +114,6 @@ class CurrencyField extends NumberField
     }
 
     /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $attributes = $this->buildAttributes();
-        $symbol = htmlspecialchars($this->symbol);
-        
-        if ($this->symbolPosition === 'before') {
-            return sprintf(
-                '<div class="input-group"><span class="input-group-text">%s</span><input type="number" name="%s" id="%s" value="%s" step="0.01" %s></div>',
-                $symbol,
-                htmlspecialchars($this->name),
-                $this->getId(),
-                htmlspecialchars($this->value ?? ''),
-                $attributes
-            );
-        } else {
-            return sprintf(
-                '<div class="input-group"><input type="number" name="%s" id="%s" value="%s" step="0.01" %s><span class="input-group-text">%s</span></div>',
-                htmlspecialchars($this->name),
-                $this->getId(),
-                htmlspecialchars($this->value ?? ''),
-                $attributes,
-                $symbol
-            );
-        }
-    }
-
-    /**
      * Convert to array.
      */
     public function toArray(): array

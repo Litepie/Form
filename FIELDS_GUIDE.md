@@ -1,150 +1,547 @@
-# Field API Documentation
+# Fields Guide
 
-Complete API reference for all field types in the Litepie Form Builder package.
-
-## Table of Contents
-
-- [Base Field API](#base-field-api)
-- [Text Input Fields](#text-input-fields)
-- [Date/Time Fields](#datetime-fields)
-- [Selection Fields](#selection-fields)
-- [Text Areas & Editors](#text-areas--editors)
-- [Numeric Fields](#numeric-fields)
-- [File/Media Fields](#filemedia-fields)
-- [Visual/Interactive Fields](#visualinteractive-fields)
-- [Complex/Dynamic Fields](#complexdynamic-fields)
-- [Layout & Content Fields](#layout--content-fields)
-- [Form Control Fields](#form-control-fields)
+Complete guide to all field types, creation methods, and API reference for the Litepie Form Builder package.
 
 ---
 
-## Base Field API
+## Table of Contents
+
+1. [Quick Reference](#quick-reference)
+2. [Creating Fields](#creating-fields)
+3. [Field API Reference](#field-api-reference)
+
+---
+
+## Quick Reference
+
+### Total Field Types: 35
+
+The Litepie Form Builder package includes **35 field types**, making it one of the most comprehensive form builders available for Laravel.
+
+### Field Types by Category
+
+#### 📝 Text Input Fields (9)
+1. **TextField** - Standard text input
+2. **EmailField** - Email with validation
+3. **PasswordField** - Password input (masked)
+4. **NumberField** - Numeric input
+5. **TelField** - Telephone number
+6. **UrlField** - URL with validation
+7. **SearchField** - Search input
+8. **HiddenField** - Hidden field
+9. **AutocompleteField** ✨ NEW - Text with autocomplete suggestions
+
+#### 📅 Date/Time Fields (7)
+10. **DateField** - Date picker
+11. **TimeField** - Time picker
+12. **DateTimeField** - Combined date/time
+13. **DateTimeLocalField** ✨ NEW - HTML5 datetime-local
+14. **WeekField** - Week picker
+15. **MonthField** - Month picker
+16. **DateRangeField** - Date range picker
+
+#### ☑️ Selection Fields (6)
+17. **SelectField** - Dropdown (single/multi)
+18. **RadioField** - Radio buttons
+19. **CheckboxField** - Single checkbox
+20. **CheckboxGroupField** ✨ NEW - Multiple checkboxes as group
+21. **ToggleField** ✨ NEW - On/off switch
+22. **TagsField** - Tag input with autocomplete
+
+#### 📄 Text Areas & Editors (2)
+23. **TextareaField** - Multi-line text
+24. **RichTextField** - WYSIWYG editor
+
+#### 💰 Specialized Numeric Fields (2)
+25. **CurrencyField** ✨ NEW - Money with currency symbol
+26. **PercentageField** ✨ NEW - Percentage (0-100)
+
+#### 📁 File/Media Fields (2)
+27. **FileField** - File upload
+28. **ImageField** - Image upload with crop
+
+#### 🎨 Visual/Interactive Fields (3)
+29. **ColorField** - Color picker
+30. **RangeField** - Slider
+31. **RatingField** - Star rating
+
+#### 🔄 Complex/Dynamic Fields (1)
+32. **RepeaterField** ✨ NEW - Dynamic array of fields
+
+#### 🔘 Form Control Fields (3)
+33. **SubmitField** - Submit button
+34. **ButtonField** - Generic button
+35. **ResetField** - Reset button
+
+### Quick Examples
+
+#### ToggleField
+```php
+Field::toggle('notifications')
+    ->label('Enable Notifications')
+    ->onLabel('Enabled')
+    ->offLabel('Disabled');
+```
+
+#### CheckboxGroupField
+```php
+Field::checkboxGroup('permissions')
+    ->label('User Permissions')
+    ->options([
+        'read' => 'Read',
+        'write' => 'Write',
+        'delete' => 'Delete',
+        'admin' => 'Administrator'
+    ])
+    ->inline(true);
+```
+
+#### CurrencyField
+```php
+Field::currency('price')
+    ->label('Product Price')
+    ->currency('USD')
+    ->min(0)
+    ->step(0.01);
+```
+
+#### RepeaterField
+```php
+Field::repeater('addresses')
+    ->label('Addresses')
+    ->schema([
+        Field::text('street')->label('Street'),
+        Field::text('city')->label('City'),
+        Field::text('zip')->label('ZIP Code')
+    ])
+    ->min(1)
+    ->max(5)
+    ->sortable(true);
+```
+
+### Comparison with Other Form Builders
+
+| Feature | Litepie Form | Filament | Laravel Nova | FormKit |
+|---------|--------------|----------|--------------|---------|
+| Total Field Types | **35** | ~35 | ~30 | ~25 |
+| Currency Field | ✅ | ✅ | ❌ | ✅ |
+| Repeater Field | ✅ | ✅ | ✅ | ✅ |
+| Toggle Switch | ✅ | ✅ | ✅ | ✅ |
+| Autocomplete | ✅ | ✅ | ✅ | ✅ |
+
+**Litepie Form has more field types than any comparable Laravel form builder!**
+
+---
+
+## Creating Fields
+
+### Overview
+
+The `Field::make()` method provides a clean, fluent way to create form fields using a simple static method.
+
+### Syntax
+
+```php
+Field::make(string $type, string $name, array $options = []): Field
+```
+
+**Parameters:**
+- `$type` - Field type (text, email, select, checkbox, etc.)
+- `$name` - Field name attribute
+- `$options` - Optional array of field properties
+
+### Basic Examples
+
+#### Text Input
+```php
+use Litepie\Form\Field;
+
+$username = Field::make('text', 'username')
+    ->label('Username')
+    ->placeholder('Enter username')
+    ->required();
+```
+
+#### Email Input
+```php
+$email = Field::make('email', 'contact_email')
+    ->label('Email Address')
+    ->required()
+    ->rules('required|email');
+```
+
+#### Select Dropdown
+```php
+$theme = Field::make('select', 'theme')
+    ->label('Select Theme')
+    ->options([
+        'dark' => 'Dark Mode',
+        'light' => 'Light Mode',
+        'auto' => 'Auto'
+    ])
+    ->value('light');
+```
+
+#### Checkbox
+```php
+$terms = Field::make('checkbox', 'accept_terms')
+    ->label('I accept the terms and conditions')
+    ->required()
+    ->rules('accepted');
+```
+
+#### Textarea
+```php
+$bio = Field::make('textarea', 'bio')
+    ->label('Biography')
+    ->placeholder('Tell us about yourself...')
+    ->setAttribute('rows', 5)
+    ->setAttribute('maxlength', 500);
+```
+
+### Advanced Field Types
+
+#### Currency Field
+```php
+$price = Field::make('currency', 'product_price')
+    ->label('Price')
+    ->currency('USD')
+    ->required();
+```
+
+#### Toggle Switch
+```php
+$notifications = Field::make('toggle', 'email_notifications')
+    ->label('Email Notifications')
+    ->onLabel('Enabled')
+    ->offLabel('Disabled');
+```
+
+#### Date Time Local
+```php
+$appointment = Field::make('datetime-local', 'appointment_time')
+    ->label('Appointment')
+    ->required()
+    ->setAttribute('min', now()->format('Y-m-d\TH:i'));
+```
+
+#### Repeater
+```php
+$addresses = Field::make('repeater', 'addresses')
+    ->label('Addresses')
+    ->schema([
+        Field::make('text', 'street')->label('Street'),
+        Field::make('text', 'city')->label('City'),
+        Field::make('text', 'zip')->label('ZIP Code')
+    ])
+    ->min(1)
+    ->max(5);
+```
+
+### Using with Advanced Features
+
+#### Conditional Visibility
+```php
+$creditCard = Field::make('text', 'credit_card_number')
+    ->label('Credit Card Number')
+    ->visibleWhen('payment_method', '=', 'card')
+    ->requiredWhen('payment_method', '=', 'card');
+```
+
+#### Computed Fields
+```php
+$total = Field::make('text', 'total_price')
+    ->label('Total')
+    ->computed(fn($data) => ($data['quantity'] ?? 0) * ($data['price'] ?? 0))
+    ->readonly();
+```
+
+#### With Tooltip and Example
+```php
+$apiKey = Field::make('text', 'api_key')
+    ->label('API Key')
+    ->tooltip('Found in your account settings')
+    ->example('sk_live_4eC39HqLyjWDarjtT1zdp7dc')
+    ->required();
+```
+
+#### With Custom Validation Messages
+```php
+$workEmail = Field::make('email', 'work_email')
+    ->label('Work Email')
+    ->rules('required|email|ends_with:@company.com')
+    ->validationMessage('required', 'Work email is mandatory')
+    ->validationMessage('email', 'Please enter a valid email')
+    ->validationMessage('ends_with', 'Must be a company email');
+```
+
+#### With Column Layout
+```php
+$firstName = Field::make('text', 'first_name')
+    ->label('First Name')
+    ->columns(6)
+    ->required();
+
+$lastName = Field::make('text', 'last_name')
+    ->label('Last Name')
+    ->columns(6)
+    ->required();
+```
+
+### Complete Form Example
+
+```php
+use Litepie\Form\Facades\Form;
+use Litepie\Form\Field;
+
+$form = Form::create()
+    ->action('/profile/update')
+    ->method('POST')
+    
+    // Personal Information
+    ->add(Field::make('text', 'first_name')
+        ->label('First Name')
+        ->columns(6)
+        ->required()
+    )
+    ->add(Field::make('text', 'last_name')
+        ->label('Last Name')
+        ->columns(6)
+        ->required()
+    )
+    
+    // Contact
+    ->add(Field::make('email', 'email')
+        ->label('Email')
+        ->columns(12)
+        ->required()
+    )
+    ->add(Field::make('tel', 'phone')
+        ->label('Phone')
+        ->columns(6)
+        ->placeholder('+1 (555) 123-4567')
+    )
+    
+    // Preferences
+    ->add(Field::make('select', 'country')
+        ->label('Country')
+        ->columns(6)
+        ->options([
+            'US' => 'United States',
+            'CA' => 'Canada',
+            'UK' => 'United Kingdom'
+        ])
+    )
+    ->add(Field::make('toggle', 'newsletter')
+        ->label('Subscribe to Newsletter')
+        ->columns(12)
+    )
+    
+    // Bio
+    ->add(Field::make('textarea', 'bio')
+        ->label('Biography')
+        ->columns(12)
+        ->setAttribute('rows', 5)
+        ->setAttribute('maxlength', 500)
+    )
+    
+    // Submit
+    ->add(Field::make('submit', 'submit')
+        ->value('Update Profile')
+        ->addClass('btn btn-primary')
+    );
+
+return $form;
+```
+
+### All Available Field Types
+
+You can use any of these field types with `Field::make()`:
+
+**Basic Input:** `text`, `email`, `password`, `number`, `tel`, `url`, `search`, `hidden`, `autocomplete`
+
+**Date/Time:** `date`, `time`, `datetime`, `datetime-local`, `week`, `month`, `daterange`
+
+**Selection:** `select`, `radio`, `checkbox`, `checkbox_group`, `toggle`, `tags`
+
+**Text Areas & Editors:** `textarea`, `richtext`
+
+**Specialized Numeric:** `currency`, `percentage`
+
+**File/Media:** `file`, `image`
+
+**Visual/Interactive:** `color`, `range`, `rating`
+
+**Complex/Dynamic:** `repeater`
+
+**Form Controls:** `submit`, `button`, `reset`
+
+### Benefits of Field::make()
+
+1. **Clean Syntax** - Simple, readable field creation
+2. **Type Safety** - IDE autocomplete support
+3. **Consistency** - Uniform API across all field types
+4. **Fluent API** - Chain methods for configuration
+5. **Factory Pattern** - Uses the FieldFactory under the hood
+6. **Flexibility** - Can pass options array or use fluent methods
+
+### Migration from Old Syntax
+
+#### Before (array-based)
+```php
+$form->add('email', 'email', [
+    'label' => 'Email Address',
+    'required' => true,
+    'placeholder' => 'you@example.com',
+    'validation' => 'required|email'
+]);
+```
+
+#### After (Field::make)
+```php
+$form->add(Field::make('email', 'email')
+    ->label('Email Address')
+    ->required()
+    ->placeholder('you@example.com')
+    ->rules('required|email')
+);
+```
+
+Both methods are supported and work identically!
+
+---
+
+## Field API Reference
+
+Complete API reference for all field types in the Litepie Form Builder package.
+
+### Base Field API
 
 All field types extend the base `Field` class and inherit these methods:
 
-### Core Methods
+#### Core Methods
 
-#### `make(string $type, string $name, array $options = []): Field`
+##### `make(string $type, string $name, array $options = []): Field`
 Static factory method to create field instances.
 ```php
 Field::make('text', 'username');
 ```
 
-#### `value(mixed $value): self`
+##### `value(mixed $value): self`
 Set the field value.
 ```php
 $field->value('John Doe');
 ```
 
-#### `getValue(): mixed`
+##### `getValue(): mixed`
 Get the current field value.
 ```php
 $value = $field->getValue();
 ```
 
-### Label & Placeholder
+#### Label & Placeholder
 
-#### `label(?string $label = null): string|self`
+##### `label(?string $label = null): string|self`
 Get or set the field label.
 ```php
 $field->label('Full Name'); // Set
 $label = $field->label();   // Get
 ```
 
-#### `placeholder(?string $placeholder = null): self|string|null`
+##### `placeholder(?string $placeholder = null): self|string|null`
 Get or set placeholder text.
 ```php
 $field->placeholder('Enter your name...');
 ```
 
-### Attributes
+#### Attributes
 
-#### `attribute(string $key, mixed $value): self`
+##### `attribute(string $key, mixed $value): self`
 Set a single HTML attribute.
 ```php
 $field->attribute('data-custom', 'value');
 ```
 
-#### `attributes(?array $attributes = null): array|self`
+##### `attributes(?array $attributes = null): array|self`
 Get or set multiple attributes.
 ```php
 $field->attributes(['data-foo' => 'bar', 'data-baz' => 'qux']);
 ```
 
-#### `addClass(string $class): self`
+##### `addClass(string $class): self`
 Add CSS class(es) to the field.
 ```php
 $field->addClass('form-control-lg');
 ```
 
-### Validation
+#### Validation
 
-#### `required(bool $required = true): self`
+##### `required(bool $required = true): self`
 Mark field as required.
 ```php
 $field->required();
 $field->required(false); // Make optional
 ```
 
-#### `validation(?string $rules = null): string|self`
+##### `validation(?string $rules = null): string|self`
 Set Laravel validation rules.
 ```php
 $field->validation('required|email|max:255');
 ```
 
-#### `requiredWhen(string $field, string $operator, mixed $value): self`
+##### `requiredWhen(string $field, string $operator, mixed $value): self`
 Set conditional required rule.
 ```php
 $field->requiredWhen('type', '=', 'premium');
 ```
 
-#### `validationMessage(string $rule, string $message): self`
+##### `validationMessage(string $rule, string $message): self`
 Set custom validation message.
 ```php
 $field->validationMessage('required', 'This field is mandatory');
 ```
 
-### Help Text & Tooltips
+#### Help Text & Tooltips
 
-#### `help(?string $help = null): self|string|null`
+##### `help(?string $help = null): self|string|null`
 Set help text displayed below the field.
 ```php
 $field->help('Enter your registered email address');
 ```
 
-#### `tooltip(?string $tooltip = null): self|string|null`
+##### `tooltip(?string $tooltip = null): self|string|null`
 Set tooltip text (shown on hover).
 ```php
 $field->tooltip('This is a hint');
 ```
 
-#### `example(?string $example = null): self|string|null`
+##### `example(?string $example = null): self|string|null`
 Set example value or hint.
 ```php
 $field->example('e.g., john@example.com');
 ```
 
-### Visibility & Permissions
+#### Visibility & Permissions
 
-#### `visible(bool $visible = true): self`
+##### `visible(bool $visible = true): self`
 Set field visibility.
 ```php
 $field->visible(false); // Hide field
 ```
 
-#### `hide(): self`
+##### `hide(): self`
 Hide the field.
 ```php
 $field->hide();
 ```
 
-#### `show(): self`
+##### `show(): self`
 Show the field.
 ```php
 $field->show();
 ```
 
-#### `visibleWhen(...$args): self`
+##### `visibleWhen(...$args): self`
 Set conditional visibility (closure or declarative).
 ```php
 // Closure-based
@@ -164,106 +561,106 @@ $field->visibleWhen('status', 'in', ['active', 'pending']);
 - `contains` - String contains
 - `starts_with`, `ends_with` - String position
 
-#### `can(string $permission): self`
+##### `can(string $permission): self`
 Set visibility based on user permission.
 ```php
 $field->can('edit-posts');
 ```
 
-#### `roles(array|string $roles): self`
+##### `roles(array|string $roles): self`
 Set visibility based on user roles.
 ```php
 $field->roles(['admin', 'editor']);
 $field->roles('admin');
 ```
 
-### State Management
+#### State Management
 
-#### `readonly(bool $readonly = true): self`
+##### `readonly(bool $readonly = true): self`
 Make field read-only.
 ```php
 $field->readonly();
 ```
 
-#### `disabled(bool $disabled = true): self`
+##### `disabled(bool $disabled = true): self`
 Disable the field.
 ```php
 $field->disabled();
 ```
 
-### Layout & Grouping
+#### Layout & Grouping
 
-#### `width(int $columns, int $total = 12): self`
+##### `width(int $columns, int $total = 12): self`
 Set field width in grid columns.
 ```php
 $field->width(6, 12); // Half width
 $field->width(4, 12); // One-third width
 ```
 
-#### `col(int $columns): self`
+##### `col(int $columns): self`
 Shorthand for width (assumes 12-column grid).
 ```php
 $field->col(6); // Half width
 $field->col(4); // One-third width
 ```
 
-#### `row(string $row): self`
+##### `row(string $row): self`
 Set row identifier for grouping.
 ```php
 $field->row('personal_info');
 ```
 
-#### `group(string $group): self`
+##### `group(string $group): self`
 Set group identifier.
 ```php
 $field->group('account_details');
 ```
 
-#### `section(string $section): self`
+##### `section(string $section): self`
 Set section identifier.
 ```php
 $field->section('billing');
 ```
 
-### Advanced Features
+#### Advanced Features
 
-#### `dependsOn(string $fieldName): self`
+##### `dependsOn(string $fieldName): self`
 Set field dependency.
 ```php
 $field->dependsOn('country');
 ```
 
-#### `computed(\Closure $callback): self`
+##### `computed(\Closure $callback): self`
 Set computed field callback.
 ```php
 $field->computed(fn($data) => $data['price'] * 1.2); // Add 20% tax
 ```
 
-#### `loadingText(string $text): self`
+##### `loadingText(string $text): self`
 Set loading text for async operations.
 ```php
 $field->loadingText('Loading options...');
 ```
 
-#### `confirmChange(string $message): self`
+##### `confirmChange(string $message): self`
 Set confirmation message for changes.
 ```php
 $field->confirmChange('Are you sure you want to change this?');
 ```
 
-#### `trackChanges(bool $track = true): self`
+##### `trackChanges(bool $track = true): self`
 Enable change tracking.
 ```php
 $field->trackChanges();
 ```
 
-#### `columns(int|array $columns): self`
+##### `columns(int|array $columns): self`
 Set number of columns for layout.
 ```php
 $field->columns(2);
 ```
 
-### Getters
+#### Getters
 
 All setter methods have corresponding getter methods:
 
@@ -288,9 +685,9 @@ $field->isVisible();      // Check if visible
 $field->hasErrors();      // Check if has errors
 ```
 
-### Array Conversion
+#### Array Conversion
 
-#### `toArray(): array`
+##### `toArray(): array`
 Convert field to array representation.
 ```php
 $array = $field->toArray();
@@ -298,9 +695,9 @@ $array = $field->toArray();
 
 ---
 
-## Text Input Fields
+### Text Input Fields
 
-### TextField
+#### TextField
 
 Standard text input field.
 
@@ -314,7 +711,7 @@ Field::make('text', 'username')
 
 **All base field methods apply.**
 
-### EmailField
+#### EmailField
 
 Email input with built-in validation.
 
@@ -326,7 +723,7 @@ Field::make('email', 'email')
     ->validation('email:rfc,dns');
 ```
 
-### PasswordField
+#### PasswordField
 
 Password input field (masked).
 
@@ -337,7 +734,7 @@ Field::make('password', 'password')
     ->validation('min:8|confirmed');
 ```
 
-### NumberField
+#### NumberField
 
 Numeric input field.
 
@@ -349,7 +746,7 @@ Field::make('number', 'age')
     ->attribute('step', 1);
 ```
 
-### TelField
+#### TelField
 
 Telephone number input.
 
@@ -360,7 +757,7 @@ Field::make('tel', 'phone')
     ->validation('required|regex:/^[\+]?[0-9\s\-\(\)]+$/');
 ```
 
-### UrlField
+#### UrlField
 
 URL input with validation.
 
@@ -371,7 +768,7 @@ Field::make('url', 'website')
     ->validation('url');
 ```
 
-### SearchField
+#### SearchField
 
 Search input field.
 
@@ -381,7 +778,7 @@ Field::make('search', 'query')
     ->placeholder('Search...');
 ```
 
-### HiddenField
+#### HiddenField
 
 Hidden input field.
 
@@ -390,7 +787,7 @@ Field::make('hidden', 'user_id')
     ->value($userId);
 ```
 
-### AutocompleteField
+#### AutocompleteField
 
 Text input with autocomplete suggestions.
 
@@ -410,9 +807,9 @@ Field::make('autocomplete', 'country')
 
 ---
 
-## Date/Time Fields
+### Date/Time Fields
 
-### DateField
+#### DateField
 
 Date picker field.
 
@@ -424,7 +821,7 @@ Field::make('date', 'birth_date')
     ->required();
 ```
 
-### TimeField
+#### TimeField
 
 Time picker field.
 
@@ -436,7 +833,7 @@ Field::make('time', 'appointment_time')
     ->attribute('step', 900); // 15 minutes
 ```
 
-### DateTimeField
+#### DateTimeField
 
 Combined date and time picker.
 
@@ -446,7 +843,7 @@ Field::make('datetime', 'event_start')
     ->required();
 ```
 
-### DateTimeLocalField
+#### DateTimeLocalField
 
 HTML5 datetime-local input.
 
@@ -457,7 +854,7 @@ Field::make('datetime-local', 'appointment')
     ->required();
 ```
 
-### WeekField
+#### WeekField
 
 Week picker field.
 
@@ -468,7 +865,7 @@ Field::make('week', 'work_week')
     ->attribute('max', '2024-W52');
 ```
 
-### MonthField
+#### MonthField
 
 Month picker field.
 
@@ -479,7 +876,7 @@ Field::make('month', 'billing_month')
     ->attribute('max', '2024-12');
 ```
 
-### DateRangeField
+#### DateRangeField
 
 Date range picker field.
 
@@ -493,9 +890,9 @@ Field::make('daterange', 'event_dates')
 
 ---
 
-## Selection Fields
+### Selection Fields
 
-### SelectField
+#### SelectField
 
 Dropdown select field (single or multiple).
 
@@ -521,7 +918,7 @@ Field::make('select', 'categories')
 - `multiple` (bool) - Allow multiple selections
 - `searchable` (bool) - Enable search functionality
 
-### RadioField
+#### RadioField
 
 Radio button group.
 
@@ -540,7 +937,7 @@ Field::make('radio', 'gender')
 **Additional Attributes:**
 - `inline` (bool) - Display options inline
 
-### CheckboxField
+#### CheckboxField
 
 Single checkbox or checkbox group.
 
@@ -560,7 +957,7 @@ Field::make('checkbox', 'permissions')
     ]);
 ```
 
-### CheckboxGroupField
+#### CheckboxGroupField
 
 Multiple checkboxes as a group.
 
@@ -576,7 +973,7 @@ Field::make('checkbox_group', 'permissions')
     ->attribute('inline', true);
 ```
 
-### ToggleField
+#### ToggleField
 
 On/off toggle switch.
 
@@ -592,7 +989,7 @@ Field::make('toggle', 'notifications')
 - `onLabel` (string) - Label when toggled on
 - `offLabel` (string) - Label when toggled off
 
-### TagsField
+#### TagsField
 
 Tag input with autocomplete.
 
@@ -611,9 +1008,9 @@ Field::make('tags', 'keywords')
 
 ---
 
-## Text Areas & Editors
+### Text Areas & Editors
 
-### TextareaField
+#### TextareaField
 
 Multi-line text input.
 
@@ -626,7 +1023,7 @@ Field::make('textarea', 'description')
     ->validation('max:1000');
 ```
 
-### RichTextField
+#### RichTextField
 
 WYSIWYG rich text editor.
 
@@ -647,68 +1044,11 @@ Field::make('richtext', 'content')
 - `config` (array) - Editor configuration
 - `height` (int) - Editor height in pixels
 
-### MarkdownField
-
-Markdown editor with preview.
-
-```php
-Field::make('markdown', 'documentation')
-    ->label('Documentation')
-    ->attribute('preview', true)
-    ->attribute('toolbar', true)
-    ->attribute('height', 500)
-    ->help('Supports GitHub Flavored Markdown');
-```
-
-**Additional Attributes:**
-- `preview` (bool) - Show live preview
-- `toolbar` (bool) - Show toolbar
-- `height` (int) - Editor height
-
-### CodeField
-
-Code editor with syntax highlighting.
-
-```php
-Field::make('code', 'script')
-    ->label('JavaScript Code')
-    ->attribute('language', 'javascript')
-    ->attribute('theme', 'monokai')
-    ->attribute('height', 400)
-    ->attribute('lineNumbers', true)
-    ->attribute('readOnly', false);
-```
-
-**Additional Attributes:**
-- `language` (string) - Programming language: 'javascript', 'php', 'python', 'html', 'css', 'json', etc.
-- `theme` (string) - Editor theme: 'monokai', 'dracula', 'github', 'vs-dark'
-- `lineNumbers` (bool) - Show line numbers
-- `readOnly` (bool) - Make editor read-only
-
-### JsonField
-
-JSON editor with validation.
-
-```php
-Field::make('json', 'config')
-    ->label('Configuration')
-    ->attribute('validate', true)
-    ->attribute('format', true)
-    ->attribute('indent', 2)
-    ->attribute('height', 300)
-    ->help('Enter valid JSON');
-```
-
-**Additional Attributes:**
-- `validate` (bool) - Validate JSON syntax
-- `format` (bool) - Auto-format JSON
-- `indent` (int) - Indentation spaces
-
 ---
 
-## Numeric Fields
+### Numeric Fields
 
-### CurrencyField
+#### CurrencyField
 
 Currency input with symbol.
 
@@ -729,7 +1069,7 @@ Field::make('currency', 'price')
 - `thousands` (string) - Thousands separator
 - `decimal` (string) - Decimal separator
 
-### PercentageField
+#### PercentageField
 
 Percentage input (0-100).
 
@@ -748,9 +1088,9 @@ Field::make('percentage', 'discount')
 
 ---
 
-## File/Media Fields
+### File/Media Fields
 
-### FileField
+#### FileField
 
 File upload with drag & drop.
 
@@ -774,7 +1114,7 @@ $field->label('Upload Document')
 - `maxFiles(int $maxFiles): self` - Max number of files
 - `uploadUrl(string $url): self` - Upload endpoint URL
 
-### ImageField
+#### ImageField
 
 Image upload with crop and preview.
 
@@ -797,50 +1137,11 @@ Field::make('image', 'banner')
 - `minHeight` (int) - Minimum height
 - `preview` (bool) - Show image preview
 
-### AvatarField
-
-Avatar/profile picture upload with cropping.
-
-```php
-Field::make('avatar', 'profile_picture')
-    ->label('Profile Picture')
-    ->attribute('size', 150)
-    ->attribute('circle', true)
-    ->attribute('initialsFrom', 'name')
-    ->attribute('defaultAvatar', '/images/default-avatar.png')
-    ->maxSize(2);
-```
-
-**Additional Attributes:**
-- `size` (int) - Avatar size in pixels
-- `circle` (bool) - Circular avatar (true) or square (false)
-- `initialsFrom` (string) - Field name to generate initials
-- `defaultAvatar` (string) - Default avatar URL
-- `square()` - Make avatar square
-
-### GalleryField
-
-Multiple image upload gallery.
-
-```php
-Field::make('gallery', 'product_images')
-    ->label('Product Images')
-    ->maxSize(5)
-    ->maxFiles(10)
-    ->attribute('sortable', true)
-    ->attribute('grid', 4)
-    ->help('Upload up to 10 images');
-```
-
-**Additional Attributes:**
-- `sortable` (bool) - Enable drag-to-reorder
-- `grid` (int) - Number of columns
-
 ---
 
-## Visual/Interactive Fields
+### Visual/Interactive Fields
 
-### ColorField
+#### ColorField
 
 Color picker.
 
@@ -856,7 +1157,7 @@ Field::make('color', 'theme_color')
 - `format` (string) - Color format: 'hex', 'rgb', 'rgba'
 - `swatches` (array) - Preset color swatches
 
-### RangeField
+#### RangeField
 
 Slider input.
 
@@ -873,7 +1174,7 @@ Field::make('range', 'volume')
 **Additional Attributes:**
 - `showValue` (bool) - Display current value
 
-### RatingField
+#### RatingField
 
 Star rating input.
 
@@ -893,51 +1194,11 @@ Field::make('rating', 'product_rating')
 - `allowHalf` (bool) - Allow half ratings
 - `color` (string) - Icon color
 
-### MapField
-
-Location/map picker.
-
-```php
-use Litepie\Form\Fields\MapField;
-
-$field = new MapField('location');
-$field->label('Business Location')
-    ->coordinates(37.7749, -122.4194) // San Francisco
-    ->zoom(12)
-    ->provider('google')
-    ->apiKey('YOUR_API_KEY')
-    ->required();
-```
-
-**Methods:**
-- `coordinates(float $lat, float $lng): self` - Set initial coordinates
-- `zoom(int $zoom): self` - Set zoom level (1-20)
-- `provider(string $provider): self` - Map provider: 'google', 'mapbox', 'openstreetmap'
-- `apiKey(string $key): self` - API key for map provider
-
-### IconField
-
-Icon picker from icon libraries.
-
-```php
-Field::make('icon', 'menu_icon')
-    ->label('Menu Icon')
-    ->attribute('library', 'fontawesome')
-    ->attribute('searchable', true)
-    ->attribute('categories', ['solid', 'regular', 'brands'])
-    ->value('fa-home');
-```
-
-**Additional Attributes:**
-- `library` (string) - Icon library: 'fontawesome', 'bootstrap-icons', 'heroicons'
-- `searchable` (bool) - Enable icon search
-- `categories` (array) - Icon categories to show
-
 ---
 
-## Complex/Dynamic Fields
+### Complex/Dynamic Fields
 
-### RepeaterField
+#### RepeaterField
 
 Dynamic repeating field groups.
 
@@ -973,72 +1234,11 @@ $field->label('Addresses')
 - `getMax(): int`
 - `isSortable(): bool`
 
-### KeyValueField
-
-Key-value pair editor.
-
-```php
-Field::make('keyvalue', 'metadata')
-    ->label('Meta Data')
-    ->attribute('keyLabel', 'Property')
-    ->attribute('valueLabel', 'Value')
-    ->attribute('addable', true)
-    ->attribute('removable', true)
-    ->attribute('keyPlaceholder', 'Enter key...')
-    ->attribute('valuePlaceholder', 'Enter value...');
-```
-
-**Additional Attributes:**
-- `keyLabel` (string) - Label for key column
-- `valueLabel` (string) - Label for value column
-- `addable` (bool) - Allow adding pairs
-- `removable` (bool) - Allow removing pairs
-- `keyPlaceholder` (string) - Placeholder for key input
-- `valuePlaceholder` (string) - Placeholder for value input
-
 ---
 
-## Layout & Content Fields
+### Form Control Fields
 
-### DividerField
-
-Visual separator with optional text.
-
-```php
-Field::make('divider')
-    ->attribute('text', 'Personal Information')
-    ->attribute('style', 'solid')
-    ->attribute('color', '#dee2e6')
-    ->attribute('spacing', 4)
-    ->attribute('align', 'left');
-```
-
-**Additional Attributes:**
-- `text` (string) - Divider label text
-- `style` (string) - Border style: 'solid', 'dashed', 'dotted'
-- `color` (string) - Border color
-- `spacing` (int) - Margin spacing (1-5)
-- `align` (string) - Text alignment: 'left', 'center', 'right'
-
-### HtmlField
-
-Display static HTML content.
-
-```php
-Field::make('html')
-    ->attribute('content', '<div class="alert alert-info">Important notice here</div>')
-    ->attribute('escapeHtml', false);
-```
-
-**Additional Attributes:**
-- `content` (string) - HTML content
-- `escapeHtml` (bool) - Escape HTML tags
-
----
-
-## Form Control Fields
-
-### SubmitField
+#### SubmitField
 
 Submit button.
 
@@ -1049,7 +1249,7 @@ Field::make('submit', 'submit')
     ->attribute('loadingText', 'Saving...');
 ```
 
-### ButtonField
+#### ButtonField
 
 Generic button.
 
@@ -1061,7 +1261,7 @@ Field::make('button', 'cancel')
     ->attribute('onclick', 'history.back()');
 ```
 
-### ResetField
+#### ResetField
 
 Reset button.
 
@@ -1083,9 +1283,6 @@ use Litepie\Form\FormBuilder;
 $form = FormBuilder::make('register')
     ->fields([
         // Personal Information
-        Field::make('divider')
-            ->attribute('text', 'Personal Information'),
-        
         Field::make('text', 'first_name')
             ->label('First Name')
             ->required()
@@ -1112,9 +1309,6 @@ $form = FormBuilder::make('register')
             ->col(6),
         
         // Account Details
-        Field::make('divider')
-            ->attribute('text', 'Account Details'),
-        
         Field::make('text', 'username')
             ->label('Username')
             ->required()
@@ -1133,9 +1327,6 @@ $form = FormBuilder::make('register')
             ->col(6),
         
         // Preferences
-        Field::make('divider')
-            ->attribute('text', 'Preferences'),
-        
         Field::make('toggle', 'newsletter')
             ->label('Subscribe to Newsletter')
             ->value(true),
@@ -1205,22 +1396,12 @@ $form = FormBuilder::make('product')
             ->attribute('crop', true)
             ->attribute('aspectRatio', '16:9'),
         
-        Field::make('gallery', 'images')
-            ->label('Product Images')
-            ->maxFiles(10)
-            ->attribute('sortable', true),
-        
         Field::make('tags', 'tags')
             ->label('Tags')
             ->attribute('allowCustom', true),
         
         Field::make('toggle', 'featured')
             ->label('Featured Product'),
-        
-        Field::make('json', 'specifications')
-            ->label('Technical Specifications')
-            ->attribute('validate', true)
-            ->visibleWhen('category_id', 'in', [1, 2, 3]),
     ]);
 ```
 
@@ -1229,12 +1410,6 @@ $form = FormBuilder::make('product')
 ```php
 $form = FormBuilder::make('profile')
     ->fields([
-        Field::make('avatar', 'avatar')
-            ->label('Profile Picture')
-            ->attribute('size', 150)
-            ->attribute('circle', true)
-            ->attribute('initialsFrom', 'name'),
-        
         Field::make('text', 'name')
             ->label('Full Name')
             ->required(),
@@ -1285,11 +1460,6 @@ $form = FormBuilder::make('profile')
             ])
             ->min(1)
             ->max(3),
-        
-        Field::make('keyvalue', 'social_links')
-            ->label('Social Media Links')
-            ->attribute('keyLabel', 'Platform')
-            ->attribute('valueLabel', 'URL'),
     ]);
 ```
 
@@ -1418,68 +1588,7 @@ Field::make('email', 'email')
 
 ---
 
-## Migration Guide
-
-### From Laravel Collective HTML
-
-```php
-// Old way
-{!! Form::text('name', null, ['class' => 'form-control']) !!}
-
-// New way
-Field::make('text', 'name')->addClass('form-control')
-```
-
-### From Filament Forms
-
-```php
-// Old way
-TextInput::make('name')->required()
-
-// New way
-Field::make('text', 'name')->required()
-```
-
----
-
-## Performance Tips
-
-1. **Cache Field Options**: For select fields with static options, cache the options array
-2. **Lazy Load Dependencies**: Use `dependsOn()` for fields that rely on other field values
-3. **Minimize Computed Fields**: Use computed fields sparingly as they execute on every render
-4. **Batch Validation**: Group validation rules efficiently
-5. **Use Visibility Conditions**: Hide unused fields to reduce DOM size
-
----
-
-## Troubleshooting
-
-### Field Not Displaying
-
-**Check:**
-- Field is visible: `$field->visible(true)`
-- No permission restrictions: `$field->can()`, `$field->roles()`
-- Visibility conditions are met: `$field->visibleWhen()`
-
-### Validation Not Working
-
-**Check:**
-- Validation rules are set: `$field->validation('required')`
-- Field is marked as required if needed: `$field->required()`
-- Field name matches form data
-
-### Options Not Showing
-
-**Check:**
-- Options are set: `$field->options([])`
-- Options array is not empty
-- Options format is correct: `['value' => 'Label']`
-
----
-
-## API Summary Tables
-
-### Field Types Quick Reference
+## Field Types Quick Reference Table
 
 | Type | Class | Primary Use Case |
 |------|-------|-----------------|
@@ -1507,72 +1616,25 @@ Field::make('text', 'name')->required()
 | tags | TagsField | Tag input |
 | textarea | TextareaField | Multi-line text |
 | richtext | RichTextField | WYSIWYG editor |
-| markdown | MarkdownField | Markdown editor |
-| code | CodeField | Code editor |
-| json | JsonField | JSON editor |
 | currency | CurrencyField | Money input |
 | percentage | PercentageField | Percentage input |
 | file | FileField | File upload |
 | image | ImageField | Image upload |
-| avatar | AvatarField | Avatar upload |
-| gallery | GalleryField | Image gallery |
 | color | ColorField | Color picker |
 | range | RangeField | Slider |
 | rating | RatingField | Star rating |
-| map | MapField | Location picker |
-| icon | IconField | Icon picker |
 | repeater | RepeaterField | Dynamic fields |
-| keyvalue | KeyValueField | Key-value pairs |
-| divider | DividerField | Visual separator |
-| html | HtmlField | Static HTML |
 | submit | SubmitField | Submit button |
 | button | ButtonField | Generic button |
 | reset | ResetField | Reset button |
-
-### Common Method Chaining Patterns
-
-```php
-// Basic field setup
-Field::make('type', 'name')
-    ->label('Label')
-    ->value('default')
-    ->required()
-    ->validation('rules');
-
-// With help and layout
-Field::make('type', 'name')
-    ->label('Label')
-    ->placeholder('Hint')
-    ->help('Description')
-    ->tooltip('Tooltip')
-    ->col(6);
-
-// With conditional visibility
-Field::make('type', 'name')
-    ->label('Label')
-    ->visibleWhen('other_field', '=', 'value')
-    ->requiredWhen('other_field', '=', 'value');
-
-// With permissions
-Field::make('type', 'name')
-    ->label('Label')
-    ->can('permission')
-    ->roles(['admin', 'editor']);
-```
 
 ---
 
 ## Support & Resources
 
-- **Documentation**: See `readme.md` for general package documentation
-- **Examples**: See `FIELD_MAKE_EXAMPLES.md` for more examples
-- **Container Examples**: See `CONTAINER_EXAMPLES.md` for form container usage
-- **Caching**: See `CACHING.md` for form caching strategies
-- **Advanced Features**: See `ADVANCED_FEATURES.md` for advanced usage
+- **Main Documentation**: See [readme.md](readme.md) for general package documentation
+- **Container Examples**: See [CONTAINER_EXAMPLES.md](CONTAINER_EXAMPLES.md) for form container usage
+- **Caching**: See [CACHING.md](CACHING.md) for form caching strategies
+- **Advanced Features**: See [ADVANCED_FEATURES.md](ADVANCED_FEATURES.md) for advanced usage
+- **New Features**: See [NEW_FEATURES.md](NEW_FEATURES.md) for latest additions
 
----
-
-**Package**: Litepie Form Builder  
-**Version**: 12.x  
-**Last Updated**: December 24, 2025  
-**Total Field Types**: 45

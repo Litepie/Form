@@ -7,22 +7,47 @@ namespace Litepie\Form\Fields;
  */
 class ResetField extends TextField
 {
+    protected string $variant = 'secondary';
+    protected string $size = 'md';
+    protected ?string $icon = null;
+    protected ?string $confirmText = null;
+
     protected function getFieldType(): string
     {
         return 'reset';
     }
 
-    public function render(): string
+    public function variant(string $variant): self
     {
-        $attributes = $this->buildAttributes();
-        $value = $this->attributes['value'] ?? 'Reset';
-        
-        return sprintf(
-            '<input type="reset" name="%s" id="%s" value="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($value),
-            $attributes
-        );
+        $this->variant = $variant;
+        return $this;
+    }
+
+    public function size(string $size): self
+    {
+        $this->size = $size;
+        return $this;
+    }
+
+    public function icon(string $icon): self
+    {
+        $this->icon = $icon;
+        return $this;
+    }
+
+    public function confirmText(string $text): self
+    {
+        $this->confirmText = $text;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'variant' => $this->variant,
+            'size' => $this->size,
+            'icon' => $this->icon,
+            'confirmText' => $this->confirmText,
+        ]);
     }
 }

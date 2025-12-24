@@ -12,6 +12,14 @@ class ImageField extends FileField
     protected int $minWidth = 100;
     protected int $minHeight = 100;
     protected array $thumbnails = [];
+    protected ?int $maxWidth = null;
+    protected ?int $maxHeight = null;
+    protected int $quality = 90;
+    protected ?string $format = null;
+    protected bool $rotate = false;
+    protected bool $flip = false;
+    protected array $filters = [];
+    protected ?array $watermark = null;
 
     protected function getFieldType(): string
     {
@@ -43,24 +51,64 @@ class ImageField extends FileField
         return $this;
     }
 
-    public function render(): string
+    public function maxWidth(int $width): self
     {
-        $this->accept = 'image/*';
-        
-        $html = parent::render();
-        
-        if ($this->crop) {
-            $html .= '<div class="image-cropper mt-3" style="display: none;">';
-            $html .= '<div class="cropper-container">';
-            $html .= '<img class="cropper-image" style="max-width: 100%;">';
-            $html .= '</div>';
-            $html .= '<div class="cropper-actions mt-3">';
-            $html .= '<button type="button" class="btn btn-primary crop-save">Save Crop</button>';
-            $html .= '<button type="button" class="btn btn-secondary crop-cancel">Cancel</button>';
-            $html .= '</div>';
-            $html .= '</div>';
-        }
+        $this->maxWidth = $width;
+        return $this;
+    }
 
-        return $html;
+    public function maxHeight(int $height): self
+    {
+        $this->maxHeight = $height;
+        return $this;
+    }
+
+    public function quality(int $quality): self
+    {
+        $this->quality = $quality;
+        return $this;
+    }
+
+    public function rotate(bool $rotate = true): self
+    {
+        $this->rotate = $rotate;
+        return $this;
+    }
+
+    public function flip(bool $flip = true): self
+    {
+        $this->flip = $flip;
+        return $this;
+    }
+
+    public function filters(array $filters): self
+    {
+        $this->filters = $filters;
+        return $this;
+    }
+
+    public function watermark(array $config): self
+    {
+        $this->watermark = $config;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'crop' => $this->crop,
+            'aspectRatio' => $this->aspectRatio,
+            'minWidth' => $this->minWidth,
+            'minHeight' => $this->minHeight,
+            'thumbnails' => $this->thumbnails,
+            'maxWidth' => $this->maxWidth,
+            'maxHeight' => $this->maxHeight,
+            'quality' => $this->quality,
+            'format' => $this->format,
+            'rotate' => $this->rotate,
+            'flip' => $this->flip,
+            'filters' => $this->filters,
+            'watermark' => $this->watermark,
+        ]);
     }
 }

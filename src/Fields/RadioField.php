@@ -9,29 +9,107 @@ use Litepie\Form\Field;
  */
 class RadioField extends Field
 {
+    /**
+     * Display inline vs stacked.
+     */
+    protected bool $inline = false;
+
+    /**
+     * Number of columns for layout.
+     */
+    protected ?int $columns = null;
+
+    /**
+     * Button style appearance.
+     */
+    protected bool $buttonStyle = false;
+
+    /**
+     * Display as selectable cards.
+     */
+    protected bool $cardStyle = false;
+
+    /**
+     * Show descriptions under options.
+     */
+    protected array $descriptions = [];
+
+    /**
+     * Show icons with options.
+     */
+    protected array $icons = [];
+
     protected function getFieldType(): string
     {
         return 'radio';
     }
 
-    public function render(): string
+    /**
+     * Set inline layout.
+     */
+    public function inline(bool $inline = true): self
     {
-        $html = '';
-        foreach ($this->options as $optionValue => $optionText) {
-            $checked = $this->value == $optionValue ? ' checked' : '';
-            $id = $this->getId() . '_' . $optionValue;
-            
-            $html .= sprintf(
-                '<div class="form-check"><input type="radio" name="%s" id="%s" value="%s"%s class="form-check-input"><label for="%s" class="form-check-label">%s</label></div>',
-                htmlspecialchars($this->name),
-                $id,
-                htmlspecialchars($optionValue),
-                $checked,
-                $id,
-                htmlspecialchars($optionText)
-            );
-        }
-        
-        return $html;
+        $this->inline = $inline;
+        return $this;
+    }
+
+    /**
+     * Set number of columns.
+     */
+    public function columns(?int $columns): self
+    {
+        $this->columns = $columns;
+        return $this;
+    }
+
+    /**
+     * Enable button style.
+     */
+    public function buttonStyle(bool $style = true): self
+    {
+        $this->buttonStyle = $style;
+        return $this;
+    }
+
+    /**
+     * Enable card style.
+     */
+    public function cardStyle(bool $style = true): self
+    {
+        $this->cardStyle = $style;
+        return $this;
+    }
+
+    /**
+     * Set descriptions for options.
+     */
+    public function descriptions(array $descriptions): self
+    {
+        $this->descriptions = $descriptions;
+        return $this;
+    }
+
+    /**
+     * Set icons for options.
+     */
+    public function icons(array $icons): self
+    {
+        $this->icons = $icons;
+        return $this;
+    }
+
+    /**
+     * Convert to array.
+     */
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'inline' => $this->inline,
+            'columns' => $this->columns,
+            'buttonStyle' => $this->buttonStyle,
+            'cardStyle' => $this->cardStyle,
+            'descriptions' => $this->descriptions,
+            'icons' => $this->icons,
+        ]);
     }
 }

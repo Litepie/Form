@@ -12,6 +12,17 @@ class RichTextField extends Field
     protected string $editor = 'tinymce';
     protected array $config = [];
     protected int $height = 300;
+    protected array $toolbar = [];
+    protected bool $menubar = true;
+    protected array $plugins = [];
+    protected bool $uploadImages = false;
+    protected ?string $imageUploadUrl = null;
+    protected ?int $maxImageSize = null;
+    protected array $formats = [];
+    protected bool $readonly = false;
+    protected bool $autoResize = false;
+    protected ?int $minHeight = null;
+    protected ?int $maxHeight = null;
 
     protected function getFieldType(): string
     {
@@ -36,34 +47,89 @@ class RichTextField extends Field
         return $this;
     }
 
-    public function render(): string
+    public function toolbar(array $toolbar): self
     {
-        $html = '<div class="rich-text-wrapper">';
-        
-        if ($this->label) {
-            $html .= '<label for="' . $this->getId() . '" class="form-label">' . htmlspecialchars($this->label);
-            if ($this->required) {
-                $html .= ' <span class="text-danger">*</span>';
-            }
-            $html .= '</label>';
-        }
+        $this->toolbar = $toolbar;
+        return $this;
+    }
 
-        $html .= '<textarea name="' . htmlspecialchars($this->name) . '" ';
-        $html .= 'id="' . $this->getId() . '" class="form-control rich-text-editor" ';
-        $html .= 'style="height: ' . $this->height . 'px;" ';
-        $html .= 'data-editor="' . $this->editor . '" ';
-        $html .= 'data-config="' . htmlspecialchars(json_encode($this->config)) . '"';
-        if ($this->required) {
-            $html .= ' required';
-        }
-        $html .= '>' . htmlspecialchars($this->value ?? '') . '</textarea>';
-        
-        if ($this->help) {
-            $html .= '<div class="form-text">' . htmlspecialchars($this->help) . '</div>';
-        }
-        
-        $html .= '</div>';
+    public function menubar(bool $show = true): self
+    {
+        $this->menubar = $show;
+        return $this;
+    }
 
-        return $html;
+    public function plugins(array $plugins): self
+    {
+        $this->plugins = $plugins;
+        return $this;
+    }
+
+    public function uploadImages(bool $upload = true): self
+    {
+        $this->uploadImages = $upload;
+        return $this;
+    }
+
+    public function imageUploadUrl(string $url): self
+    {
+        $this->imageUploadUrl = $url;
+        return $this;
+    }
+
+    public function maxImageSize(int $size): self
+    {
+        $this->maxImageSize = $size;
+        return $this;
+    }
+
+    public function formats(array $formats): self
+    {
+        $this->formats = $formats;
+        return $this;
+    }
+
+    public function readonly(bool $readonly = true): self
+    {
+        $this->readonly = $readonly;
+        return $this;
+    }
+
+    public function autoResize(bool $resize = true): self
+    {
+        $this->autoResize = $resize;
+        return $this;
+    }
+
+    public function minHeight(int $height): self
+    {
+        $this->minHeight = $height;
+        return $this;
+    }
+
+    public function maxHeight(int $height): self
+    {
+        $this->maxHeight = $height;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'editor' => $this->editor,
+            'config' => $this->config,
+            'height' => $this->height,
+            'toolbar' => $this->toolbar,
+            'menubar' => $this->menubar,
+            'plugins' => $this->plugins,
+            'uploadImages' => $this->uploadImages,
+            'imageUploadUrl' => $this->imageUploadUrl,
+            'maxImageSize' => $this->maxImageSize,
+            'formats' => $this->formats,
+            'readonly' => $this->readonly,
+            'autoResize' => $this->autoResize,
+            'minHeight' => $this->minHeight,
+            'maxHeight' => $this->maxHeight,
+        ]);
     }
 }

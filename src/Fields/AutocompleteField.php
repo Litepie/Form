@@ -40,15 +40,6 @@ class AutocompleteField extends TextField
     }
 
     /**
-     * Set minimum length before showing suggestions.
-     */
-    public function minLength(int $length): self
-    {
-        $this->minLength = $length;
-        return $this;
-    }
-
-    /**
      * Get minimum length.
      */
     public function getMinLength(): int
@@ -88,28 +79,6 @@ class AutocompleteField extends TextField
     public function getSource(): string
     {
         return $this->source;
-    }
-
-    /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $attributes = $this->buildAttributes();
-        $optionsList = json_encode(array_keys($this->options));
-        
-        return sprintf(
-            '<input type="text" name="%s" id="%s" value="%s" class="autocomplete-field" data-options=\'%s\' data-allow-custom="%s" data-min-length="%d" data-max-suggestions="%d" data-source="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? ''),
-            $optionsList,
-            $this->allowCustom ? 'true' : 'false',
-            $this->minLength,
-            $this->maxSuggestions,
-            htmlspecialchars($this->source),
-            $attributes
-        );
     }
 
     /**

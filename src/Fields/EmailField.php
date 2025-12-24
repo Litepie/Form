@@ -7,6 +7,13 @@ namespace Litepie\Form\Fields;
  */
 class EmailField extends TextField
 {
+    protected bool $multiple = false;
+    protected bool $validateDomain = false;
+    protected array $allowedDomains = [];
+    protected array $blockedDomains = [];
+    protected bool $suggestDomains = false;
+    protected array $commonDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com'];
+
     /**
      * Get the field type.
      */
@@ -15,19 +22,51 @@ class EmailField extends TextField
         return 'email';
     }
 
-    /**
-     * Render the field.
-     */
-    public function render(): string
+    public function multiple(bool $multiple = true): self
     {
-        $attributes = $this->buildAttributes();
-        
-        return sprintf(
-            '<input type="email" name="%s" id="%s" value="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? ''),
-            $attributes
-        );
+        $this->multiple = $multiple;
+        return $this;
+    }
+
+    public function validateDomain(bool $validate = true): self
+    {
+        $this->validateDomain = $validate;
+        return $this;
+    }
+
+    public function allowedDomains(array $domains): self
+    {
+        $this->allowedDomains = $domains;
+        return $this;
+    }
+
+    public function blockedDomains(array $domains): self
+    {
+        $this->blockedDomains = $domains;
+        return $this;
+    }
+
+    public function suggestDomains(bool $suggest = true): self
+    {
+        $this->suggestDomains = $suggest;
+        return $this;
+    }
+
+    public function commonDomains(array $domains): self
+    {
+        $this->commonDomains = $domains;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'multiple' => $this->multiple,
+            'validateDomain' => $this->validateDomain,
+            'allowedDomains' => $this->allowedDomains,
+            'blockedDomains' => $this->blockedDomains,
+            'suggestDomains' => $this->suggestDomains,
+            'commonDomains' => $this->commonDomains,
+        ]);
     }
 }

@@ -57,25 +57,6 @@ class ToggleField extends Field
     }
 
     /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $attributes = $this->buildAttributes();
-        $checked = $this->value ? ' checked' : '';
-        
-        return sprintf(
-            '<div class="form-check form-switch"><input type="checkbox" name="%s" id="%s" value="1"%s class="form-check-input" role="switch" %s><label class="form-check-label" for="%s">%s</label></div>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            $checked,
-            $attributes,
-            $this->getId(),
-            htmlspecialchars($this->value ? $this->onLabel : $this->offLabel)
-        );
-    }
-
-    /**
      * Convert to array.
      */
     public function toArray(): array

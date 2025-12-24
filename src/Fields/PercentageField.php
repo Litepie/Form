@@ -49,23 +49,6 @@ class PercentageField extends NumberField
     }
 
     /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $attributes = $this->buildAttributes();
-        
-        return sprintf(
-            '<div class="input-group"><input type="number" name="%s" id="%s" value="%s" min="0" max="100" step="%s" %s><span class="input-group-text">%%</span></div>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? ''),
-            $this->getAttribute('step', 0.01),
-            $attributes
-        );
-    }
-
-    /**
      * Convert to array.
      */
     public function toArray(): array

@@ -129,25 +129,6 @@ class RepeaterField extends Field
     }
 
     /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $schemaJson = json_encode(array_map(fn($field) => $field->toArray(), $this->schema));
-        
-        return sprintf(
-            '<div class="repeater-field" data-name="%s" data-min="%d" data-max="%d" data-sortable="%s" data-schema=\'%s\' data-add-text="%s" data-remove-text="%s"></div>',
-            htmlspecialchars($this->name),
-            $this->min,
-            $this->max,
-            $this->sortable ? 'true' : 'false',
-            htmlspecialchars($schemaJson),
-            htmlspecialchars($this->addButtonText),
-            htmlspecialchars($this->removeButtonText)
-        );
-    }
-
-    /**
      * Convert to array.
      */
     public function toArray(): array

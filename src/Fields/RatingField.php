@@ -9,26 +9,89 @@ use Litepie\Form\Field;
  */
 class RatingField extends Field
 {
+    protected int $max = 5;
+    protected string $icon = 'star';
+    protected bool $allowHalf = false;
+    protected bool $allowClear = false;
+    protected bool $showCount = false;
+    protected string $size = 'md';
+    protected ?string $color = null;
+    protected ?string $emptyColor = null;
+    protected bool $readonly = false;
+    protected array $tooltips = [];
+
     protected function getFieldType(): string
     {
         return 'number';
     }
 
-    public function render(): string
+    public function icon(string $icon): self
     {
-        $max = $this->attributes['max'] ?? 5;
-        $step = $this->attributes['allowHalf'] ?? false ? '0.5' : '1';
-        
-        $attributes = $this->buildAttributes();
-        
-        return sprintf(
-            '<input type="number" name="%s" id="%s" value="%s" min="0" max="%s" step="%s" %s>',
-            htmlspecialchars($this->name),
-            $this->getId(),
-            htmlspecialchars($this->value ?? '0'),
-            htmlspecialchars($max),
-            $step,
-            $attributes
-        );
+        $this->icon = $icon;
+        return $this;
+    }
+
+    public function allowHalf(bool $allow = true): self
+    {
+        $this->allowHalf = $allow;
+        return $this;
+    }
+
+    public function allowClear(bool $allow = true): self
+    {
+        $this->allowClear = $allow;
+        return $this;
+    }
+
+    public function showCount(bool $show = true): self
+    {
+        $this->showCount = $show;
+        return $this;
+    }
+
+    public function size(string $size): self
+    {
+        $this->size = $size;
+        return $this;
+    }
+
+    public function color(string $color): self
+    {
+        $this->color = $color;
+        return $this;
+    }
+
+    public function emptyColor(string $color): self
+    {
+        $this->emptyColor = $color;
+        return $this;
+    }
+
+    public function readonly(bool $readonly = true): self
+    {
+        $this->readonly = $readonly;
+        return $this;
+    }
+
+    public function tooltips(array $tooltips): self
+    {
+        $this->tooltips = $tooltips;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'max' => $this->max,
+            'icon' => $this->icon,
+            'allowHalf' => $this->allowHalf,
+            'allowClear' => $this->allowClear,
+            'showCount' => $this->showCount,
+            'size' => $this->size,
+            'color' => $this->color,
+            'emptyColor' => $this->emptyColor,
+            'readonly' => $this->readonly,
+            'tooltips' => $this->tooltips,
+        ]);
     }
 }

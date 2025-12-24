@@ -13,6 +13,15 @@ class DateRangeField extends Field
     protected ?string $endDate = null;
     protected string $format = 'Y-m-d';
     protected string $separator = ' to ';
+    protected ?string $minDate = null;
+    protected ?string $maxDate = null;
+    protected ?int $minDays = null;
+    protected ?int $maxDays = null;
+    protected bool $showPresets = false;
+    protected array $presets = [];
+    protected bool $singleCalendar = false;
+    protected bool $clearable = true;
+    protected bool $autoApply = false;
 
     protected function getFieldType(): string
     {
@@ -31,34 +40,76 @@ class DateRangeField extends Field
         return $this;
     }
 
-    public function render(): string
+    public function minDate(string $date): self
     {
-        $attributes = $this->buildAttributes();
-        
-        $html = '<div class="date-range-wrapper">';
-        
-        if ($this->label) {
-            $html .= '<label class="form-label">' . htmlspecialchars($this->label);
-            if ($this->required) {
-                $html .= ' <span class="text-danger">*</span>';
-            }
-            $html .= '</label>';
-        }
+        $this->minDate = $date;
+        return $this;
+    }
 
-        $html .= '<div class="input-group">';
-        $html .= '<input type="date" name="' . htmlspecialchars($this->name) . '[start]" ';
-        $html .= 'class="form-control" placeholder="Start Date" ' . $attributes . '>';
-        $html .= '<span class="input-group-text">' . htmlspecialchars($this->separator) . '</span>';
-        $html .= '<input type="date" name="' . htmlspecialchars($this->name) . '[end]" ';
-        $html .= 'class="form-control" placeholder="End Date" ' . $attributes . '>';
-        $html .= '</div>';
-        
-        if ($this->help) {
-            $html .= '<div class="form-text">' . htmlspecialchars($this->help) . '</div>';
-        }
-        
-        $html .= '</div>';
+    public function maxDate(string $date): self
+    {
+        $this->maxDate = $date;
+        return $this;
+    }
 
-        return $html;
+    public function minDays(int $days): self
+    {
+        $this->minDays = $days;
+        return $this;
+    }
+
+    public function maxDays(int $days): self
+    {
+        $this->maxDays = $days;
+        return $this;
+    }
+
+    public function showPresets(bool $show = true): self
+    {
+        $this->showPresets = $show;
+        return $this;
+    }
+
+    public function presets(array $presets): self
+    {
+        $this->presets = $presets;
+        return $this;
+    }
+
+    public function singleCalendar(bool $single = true): self
+    {
+        $this->singleCalendar = $single;
+        return $this;
+    }
+
+    public function clearable(bool $clearable = true): self
+    {
+        $this->clearable = $clearable;
+        return $this;
+    }
+
+    public function autoApply(bool $auto = true): self
+    {
+        $this->autoApply = $auto;
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+            'format' => $this->format,
+            'separator' => $this->separator,
+            'minDate' => $this->minDate,
+            'maxDate' => $this->maxDate,
+            'minDays' => $this->minDays,
+            'maxDays' => $this->maxDays,
+            'showPresets' => $this->showPresets,
+            'presets' => $this->presets,
+            'singleCalendar' => $this->singleCalendar,
+            'clearable' => $this->clearable,
+            'autoApply' => $this->autoApply,
+        ]);
     }
 }

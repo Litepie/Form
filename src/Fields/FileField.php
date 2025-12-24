@@ -51,54 +51,6 @@ class FileField extends Field
         return $this;
     }
 
-    public function render(): string
-    {
-        $attributes = $this->buildAttributes();
-        
-        if ($this->multiple) {
-            $attributes .= ' multiple';
-        }
-        
-        if ($this->accept) {
-            $attributes .= ' accept="' . htmlspecialchars($this->accept) . '"';
-        }
-
-        $html = '<div class="file-upload-wrapper">';
-        
-        if ($this->label) {
-            $html .= '<label for="' . $this->getId() . '" class="form-label">' . htmlspecialchars($this->label);
-            if ($this->required) {
-                $html .= ' <span class="text-danger">*</span>';
-            }
-            $html .= '</label>';
-        }
-
-        $html .= '<div class="file-upload-area" data-max-size="' . $this->maxSize . '" data-max-files="' . $this->maxFiles . '">';
-        $html .= '<div class="file-upload-content">';
-        $html .= '<i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>';
-        $html .= '<h5>Drag & drop files here</h5>';
-        $html .= '<p class="text-muted">or click to browse</p>';
-        $html .= '<small class="text-muted">Max size: ' . $this->maxSize . 'MB per file</small>';
-        $html .= '</div>';
-        
-        $html .= '<input type="file" name="' . htmlspecialchars($this->name) . '" ';
-        $html .= 'id="' . $this->getId() . '" class="file-input" ' . $attributes . ' style="display: none;">';
-        
-        $html .= '</div>';
-        
-        if ($this->preview) {
-            $html .= '<div class="file-preview-container mt-3"></div>';
-        }
-        
-        if ($this->help) {
-            $html .= '<div class="form-text">' . htmlspecialchars($this->help) . '</div>';
-        }
-        
-        $html .= '</div>';
-
-        return $html;
-    }
-
     public function toArray(): array
     {
         return array_merge(parent::toArray(), [

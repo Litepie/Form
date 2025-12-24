@@ -33,9 +33,6 @@ class FieldFactory
         // Text areas and rich content
         'textarea' => Fields\TextareaField::class,
         'richtext' => Fields\RichTextField::class,
-        'markdown' => Fields\MarkdownField::class,
-        'code' => Fields\CodeField::class,
-        'json' => Fields\JsonField::class,
         
         // Selection fields
         'select' => Fields\SelectField::class,
@@ -49,8 +46,6 @@ class FieldFactory
         // File upload fields
         'file' => Fields\FileField::class,
         'image' => Fields\ImageField::class,
-        'avatar' => Fields\AvatarField::class,
-        'gallery' => Fields\GalleryField::class,
         
         // Date and time fields
         'date' => Fields\DateField::class,
@@ -69,16 +64,9 @@ class FieldFactory
         'color' => Fields\ColorField::class,
         'range' => Fields\RangeField::class,
         'rating' => Fields\RatingField::class,
-        'map' => Fields\MapField::class,
-        'icon' => Fields\IconField::class,
         
         // Complex/Dynamic fields
         'repeater' => Fields\RepeaterField::class,
-        'keyvalue' => Fields\KeyValueField::class,
-        
-        // Layout fields
-        'divider' => Fields\DividerField::class,
-        'html' => Fields\HtmlField::class,
         
         // Form control fields
         'submit' => Fields\SubmitField::class,

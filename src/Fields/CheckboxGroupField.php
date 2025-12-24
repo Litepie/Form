@@ -39,34 +39,6 @@ class CheckboxGroupField extends Field
     }
 
     /**
-     * Render the field.
-     */
-    public function render(): string
-    {
-        $html = '';
-        $values = (array)($this->value ?? []);
-        
-        foreach ($this->options as $optionValue => $optionText) {
-            $checked = in_array($optionValue, $values) ? ' checked' : '';
-            $id = $this->getId() . '_' . $optionValue;
-            $class = $this->inline ? 'form-check-inline' : 'form-check';
-            
-            $html .= sprintf(
-                '<div class="%s"><input type="checkbox" name="%s[]" id="%s" value="%s"%s class="form-check-input"><label for="%s" class="form-check-label">%s</label></div>',
-                $class,
-                htmlspecialchars($this->name),
-                $id,
-                htmlspecialchars($optionValue),
-                $checked,
-                $id,
-                htmlspecialchars($optionText)
-            );
-        }
-        
-        return $html;
-    }
-
-    /**
      * Convert to array.
      */
     public function toArray(): array
