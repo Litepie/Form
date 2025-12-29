@@ -55,13 +55,15 @@ class RadioField extends Field
 
     /**
      * Set number of columns.
+     * Overrides parent to maintain compatibility.
      */
-    public function columns(?int $columns): self
+    public function columns(array|int $columns): self
     {
-        $this->columns = $columns;
-        return $this;
+        if (is_int($columns)) {
+            $this->columns = $columns;
+        }
+        return parent::columns($columns);
     }
-
     /**
      * Enable button style.
      */

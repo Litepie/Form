@@ -17,6 +17,7 @@ class RangeField extends Field
     protected bool $showTicks = false;
     protected ?int $tickInterval = null;
     protected ?string $tooltip = null;
+    protected bool $showTooltip = false;
     protected bool $dual = false;
     protected bool $vertical = false;
     protected ?string $color = null;
@@ -56,9 +57,15 @@ class RangeField extends Field
         return $this;
     }
 
-    public function tooltip(bool $show = true): self
+    public function tooltip(?string $tooltip = null): self
     {
-        $this->tooltip = $show;
+        $this->tooltip = $tooltip;
+        return $this;
+    }
+
+    public function showTooltip(bool $showTooltip = false): self
+    {
+        $this->showTooltip = $showTooltip;
         return $this;
     }
 
@@ -94,6 +101,7 @@ class RangeField extends Field
             'dual' => $this->dual,
             'vertical' => $this->vertical,
             'color' => $this->color,
+            'showTooltip' => $this->showTooltip,
         ]);
     }
 }
