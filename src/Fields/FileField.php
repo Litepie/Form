@@ -15,10 +15,35 @@ class FileField extends Field
     protected int $maxFiles = 5;
     protected bool $preview = true;
     protected string $uploadUrl = '';
+    protected $editForm = null;
+    protected bool $useCropper = false;
 
     protected function getFieldType(): string
     {
         return 'file';
+    }
+
+    /**
+     * Set the edit form for file metadata.
+     *
+     * @param mixed $form FormComponent instance or form identifier
+     * @return self
+     */
+    public function edit($form): self
+    {
+        $this->editForm = $form;
+        return $this;
+    }
+
+    /**
+     * Alias for edit() method.
+     *
+     * @param mixed $form FormComponent instance or form identifier
+     * @return self
+     */
+    public function editForm($form): self
+    {
+        return $this->edit($form);
     }
 
     public function multiple(bool $multiple = true): self
@@ -45,6 +70,18 @@ class FileField extends Field
         return $this;
     }
 
+    public function preview(bool $preview = true): self
+    {
+        $this->preview = $preview;
+        return $this;
+    }
+
+    public function useCropper(bool $useCropper = true): self
+    {
+        $this->useCropper = $useCropper;
+        return $this;
+    }
+
     public function uploadUrl(string $url): self
     {
         $this->uploadUrl = $url;
@@ -53,13 +90,22 @@ class FileField extends Field
 
     public function toArray(): array
     {
-        return array_merge(parent::toArray(), [
+        $data = array_merge(parent::toArray(), [
             'multiple' => $this->multiple,
             'accept' => $this->accept,
             'maxSize' => $this->maxSize,
             'maxFiles' => $this->maxFiles,
             'preview' => $this->preview,
             'uploadUrl' => $this->uploadUrl,
+            'useCropper' => $this->useCropper,
         ]);
+
+        if ($this->editForm !== null) {
+            $data['editForm'] = is_callable([$this->editForm, 'toArray'])
+                ? $this->editForm->toArray()
+                : $this->editForm;
+        }
+
+        return $data;
     }
 }
