@@ -3,6 +3,7 @@
 namespace Litepie\Form\Fields;
 
 use Litepie\Form\Field;
+use Litepie\Layout\Components\FormComponent;
 
 /**
  * Advanced File Upload Field with Drag & Drop
@@ -15,35 +16,12 @@ class FileField extends Field
     protected int $maxFiles = 5;
     protected bool $preview = true;
     protected string $uploadUrl = '';
-    protected $editForm = null;
     protected bool $useCropper = false;
+    protected mixed $editForm = null;
 
     protected function getFieldType(): string
     {
         return 'file';
-    }
-
-    /**
-     * Set the edit form for file metadata.
-     *
-     * @param mixed $form FormComponent instance or form identifier
-     * @return self
-     */
-    public function edit($form): self
-    {
-        $this->editForm = $form;
-        return $this;
-    }
-
-    /**
-     * Alias for edit() method.
-     *
-     * @param mixed $form FormComponent instance or form identifier
-     * @return self
-     */
-    public function editForm($form): self
-    {
-        return $this->edit($form);
     }
 
     public function multiple(bool $multiple = true): self
@@ -70,6 +48,12 @@ class FileField extends Field
         return $this;
     }
 
+    public function uploadUrl(string $url): self
+    {
+        $this->uploadUrl = $url;
+        return $this;
+    }
+
     public function preview(bool $preview = true): self
     {
         $this->preview = $preview;
@@ -82,30 +66,25 @@ class FileField extends Field
         return $this;
     }
 
-    public function uploadUrl(string $url): self
+    public function editForm(FormComponent $editForm): self
     {
-        $this->uploadUrl = $url;
+        $this->editForm = $editForm instanceof FormComponent
+            ? $editForm->toArray()
+            : (is_array($editForm) ? $editForm : (method_exists($editForm, 'toArray') ? $editForm->toArray() : $editForm));
         return $this;
     }
 
     public function toArray(): array
     {
-        $data = array_merge(parent::toArray(), [
-            'multiple' => $this->multiple,
-            'accept' => $this->accept,
-            'maxSize' => $this->maxSize,
-            'maxFiles' => $this->maxFiles,
-            'preview' => $this->preview,
-            'uploadUrl' => $this->uploadUrl,
+        return array_merge(parent::toArray(), [
+            'multiple'   => $this->multiple,
+            'accept'     => $this->accept,
+            'maxSize'    => $this->maxSize,
+            'maxFiles'   => $this->maxFiles,
+            'preview'    => $this->preview,
+            'uploadUrl'  => $this->uploadUrl,
             'useCropper' => $this->useCropper,
+            'editForm'   => $this->editForm,
         ]);
-
-        if ($this->editForm !== null) {
-            $data['editForm'] = is_callable([$this->editForm, 'toArray'])
-                ? $this->editForm->toArray()
-                : $this->editForm;
-        }
-
-        return $data;
     }
 }
